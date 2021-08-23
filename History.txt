@@ -1,0 +1,20 @@
+ARM6502 revision history
+-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+V0.1.5 - 2021-02-28 (FluBBa)
+	Added load/save state.
+	Better support for decimal mode.
+	Removed dependency on cpu2Ram.
+	Removed unneccesary space in state.
+
+V0.1.2 - 2018-05-11 (FluBBa)
+	Now runs code correctly.
+
+V0.1.1 - 2018-05-07 (FluBBa)
+	Added back jump table.
+	Added unoffical opcodes.
+	Removed unused opcodes.
+
+V0.1.0 - 2018-04-22 (FluBBa)
+	Forked from ARMH6280.

@@ -1,0 +1,15 @@
+ARM6502 To do
+--------------
+
+	Add RICOH_N2A03 define to handle decimal mode on/off.
+	Add define for 65c02 to handle:
+	* Read/modify write.
+	* Decimal calculation.
+	* Page wrap handling.
+	* More?
+	Verify decimal mode.
+	Optimize decimal mode.
+	Optimize set NMI pin.
+	Optimize NMI/IRQ check.
+	Make core completly objectified.
+
