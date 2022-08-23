@@ -1,6 +1,7 @@
 ARM6502 To do
 --------------
 
+	Remove doZPI & readMemZPA macro plus memRead8ZPI code.
 	Add RICOH_N2A03 define to handle decimal mode on/off.
 	Add define for 65c02 to handle:
 	* Read/modify write.
