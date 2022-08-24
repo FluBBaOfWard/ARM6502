@@ -22,17 +22,6 @@
 	.equ RES_VECTOR, 0xFFFC		;@ RESET interrupt vector address
 	.equ NMI_VECTOR, 0xFFFA		;@ NMI interrupt vector address
 ;@----------------------------------------------------------------------------
-	.equ CYC_SHIFT, 8
-	.equ CYCLE, 1<<CYC_SHIFT	;@ one cycle
-	.equ CYC_MASK, CYCLE-1		;@ Mask
-;@----------------------------------------------------------------------------
-;@ cycle flags- (stored in cycles reg for speed)
-
-	.equ CYC_C, 0x01			;@ Carry bit
-	.equ CYC_I, 0x04			;@ IRQ mask
-	.equ CYC_D, 0x08			;@ Decimal bit
-	.equ CYC_V, 0x40			;@ Overflow bit
-;@----------------------------------------------------------------------------
 
 
 	.macro loadLastBank reg

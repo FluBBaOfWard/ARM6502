@@ -1535,7 +1535,7 @@ m6502SaveState:			;@ In r0=destination, r1=m6502optbl. Out r0=state size.
 	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502LoadState:			;@ In r0=m6809optbl, r1=source. Out r0=state size.
+m6502LoadState:			;@ In r0=m6502optbl, r1=source. Out r0=state size.
 	.type   m6502LoadState STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{m6502pc,m6502optbl,lr}

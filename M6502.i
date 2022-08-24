@@ -11,6 +11,19 @@
 	m6502zpage	.req r11		;@ ZeroPage RAM ptr
 	addy		.req r12		;@ Keep this at r12 (scratch for APCS)
 
+;@----------------------------------------------------------------------------
+	.equ CYC_SHIFT, 8
+	.equ CYCLE, 1<<CYC_SHIFT	;@ one cycle
+	.equ CYC_MASK, CYCLE-1		;@ Mask
+;@----------------------------------------------------------------------------
+;@ cycle flags- (stored in cycles reg for speed)
+
+	.equ CYC_C, 0x01			;@ Carry bit
+	.equ CYC_I, 0x04			;@ IRQ mask
+	.equ CYC_D, 0x08			;@ Decimal bit
+	.equ CYC_V, 0x40			;@ Overflow bit
+;@----------------------------------------------------------------------------
+
 	.struct 0					;@ Changes section so make sure it's set before real code.
 m6502Opz:			.space 256*4
 m6502MemTbl:		.space 8*4
