@@ -214,7 +214,11 @@
 	.macro readWriteMem				;@ !! Crazy Maniacs use this feature !!
 	.ifeq AddressMode-_ABS
 		readMem8
+#if defined(W65C02) || defined(KS5360)
+		readMem8
+#else
 		writeMem8
+#endif
 	.endif
 	.ifeq AddressMode-_ZP
 		readMemZP
@@ -321,6 +325,11 @@
 	.macro doZ				;@ Zero page			$nn
 	.set AddressMode, _ZP
 	ldrb addy,[m6502pc],#1
+	.endm
+
+	.macro doZ2				;@ Zero page			$nn
+	.set AddressMode, _ZP
+	ldrb addy,[h6280pc],#2		;@ Ugly thing for bbr/bbs
 	.endm
 
 	.macro doZIX			;@ Zero page indexed X	$nn,X
@@ -443,6 +452,49 @@
 	fetch \cyc
 	.endm
 
+	.macro opBBR bit
+	doZ2
+	readMemZP
+	tst r0,#1<<(\bit)
+	bne noBBranch
+	ldrbeqs r0,[m6502pc,#-1]
+	addeq m6502pc,m6502pc,r0
+	fetch 6
+	.endm
+
+	.macro opBBRx bit
+	doZ2
+	readMemZP
+	tst r0,#1<<(\bit)
+	bne noBBranch
+	ldrbeqs r0,[m6502pc,#-1]
+	addeq m6502pc,m6502pc,r0
+	cmp r0,#-3
+	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
+	fetch 6
+	.endm
+
+	.macro opBBS bit
+	doZ2
+	readMemZP
+	tst r0,#1<<(\bit)
+	beq noBBranch
+	ldrbnes r0,[m6502pc,#-1]
+	addne m6502pc,m6502pc,r0
+	fetch 6
+	.endm
+
+	.macro opBBSx bit
+	doZ2
+	readmemzp
+	tst r0,#1<<(\bit)
+	beq noBBranch
+	ldrbnes r0,[m6502pc,#-1]
+	addne m6502pc,m6502pc,r0
+	cmp r0,#-3
+	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
+	fetch 6
+	.endm
 
 	.macro opBIT cyc
 	bic cycles,cycles,#CYC_V		;@ Clear V
@@ -659,6 +711,14 @@
 	fetch \cyc
 	.endm
 
+	.macro opRMB bit
+	doZ
+	readMemZP
+	bic r0,r0,#1<<(\bit)
+	writeMemZP
+	fetch 5
+	.endm
+
 	.macro opROL cyc
 	readWriteMem
 	movs cycles,cycles,lsr#1		;@ Get C
@@ -843,6 +903,14 @@
 	fetch \cyc
 	.endm
 
+	.macro opSMB bit
+	doZ
+	readMemZP
+	orr r0,r0,#1<<(\bit)
+	writeMemZP
+	fetch 5
+	.endm
+
 	.macro opSRE cyc
 	readWriteMem
 	movs r0,r0,lsr#1
@@ -856,6 +924,30 @@
 
 	.macro opSTORE reg cyc
 	mov r0,\reg,lsr#24
+	writeMem
+	fetch \cyc
+	.endm
+
+	.macro opSTZ cyc
+	mov r0,#0
+	writeMem
+	fetch \cyc
+	.endm
+
+	.macro opTRB cyc
+	readMem
+	bic r0,r0,m6502a,lsr#24			;@ Result
+	bic m6502nz,m6502nz,#0xFF
+	orr m6502nz,m6502nz,r0			;@ Z
+	writeMem
+	fetch \cyc
+	.endm
+
+	.macro opTSB cyc
+	readMem
+	orr r0,r0,m6502a,lsr#24			;@ Result
+	bic m6502nz,m6502nz,#0xFF
+	orr m6502nz,m6502nz,r0			;@ Z
 	writeMem
 	fetch \cyc
 	.endm
