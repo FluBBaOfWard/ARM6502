@@ -424,10 +424,10 @@
 	tst r0,#0x40000000
 	biceq cycles,cycles,#CYC_V		;@ V
 	mov m6502nz,m6502a,asr#24		;@ NZ
-
+#ifndef CPU_N2A03
 	tst cycles,#CYC_D
 	bne .F0
-
+#endif
 	tst m6502a,m6502a,lsr#31
 	b .F1
 .F0:
@@ -620,10 +620,10 @@
 	add r0,r0,#0x01
 	and r0,r0,#0xFF					;@ This is only needed for decimal mode.
 	writeMem
-
+#ifndef CPU_N2A03
 	tst cycles,#CYC_D
 	bne opSBC_Dec
-
+#endif
 	tst cycles,cycles,lsr#1			;@ Get C
 	sbcs m6502a,m6502a,r0,lsl#24
 	and m6502a,m6502a,#0xff000000
@@ -750,9 +750,10 @@
 	orr m6502nz,r0,r0,lsl#24		;@ NZ
 	adc cycles,cycles,cycles		;@ Set C
 	writeMem
+#ifndef CPU_N2A03
 	tst cycles,#CYC_D
 	bne opADC_Dec
-
+#endif
 	movs r1,cycles,lsr#1			;@ Get C
 	subcs r0,r0,#0x00000100
 	adcs m6502a,m6502a,r0,ror#8
