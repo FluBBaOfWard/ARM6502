@@ -214,7 +214,7 @@
 	.macro readWriteMem				;@ !! Crazy Maniacs use this feature !!
 	.ifeq AddressMode-_ABS
 		readMem8
-#if defined(W65C02) || defined(KS5360)
+#if defined(W65C02) || defined(CPU_KS5360)
 		readMem8
 #else
 		writeMem8
@@ -368,9 +368,10 @@
 	.endm
 
 	.macro opADC cyc
+#ifndef CPU_N2A03
 	tst cycles,#CYC_D
 	bne opADC_Dec
-
+#endif
 	movs r1,cycles,lsr#1			;@ Get C
 	subcs r0,r0,#0x00000100
 	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
@@ -381,6 +382,7 @@
 	executeOpcode_c \cyc
 	.endm
 
+#ifndef CPU_N2A03
 	.macro opADCD cyc
 	movs r1,cycles,lsr#1        	;@ Get C
 	adc m6502nz,r0,m6502a,lsr#24	;@ Z is set with normal addition
@@ -403,7 +405,7 @@
 	addcs m6502a,m6502a,#0x60000000
 	fetch_c \cyc
 	.endm
-
+#endif
 
 	.macro opAND cyc
 	and m6502a,m6502a,r0,lsl#24
@@ -768,9 +770,10 @@
 	.endm
 
 	.macro opSBC cyc
+#ifndef CPU_N2A03
 	tst cycles,#CYC_D
 	bne opSBC_Dec
-
+#endif
 	movs r1,cycles,lsr#1			;@ Get C
 	sbcs m6502a,m6502a,r0,lsl#24
 	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
@@ -781,6 +784,7 @@
 	executeOpcode_c \cyc
 	.endm
 
+#ifndef CPU_N2A03
 	.macro opSBCD cyc
 	movs r1,cycles,lsr#1			;@ Get C
 	subcc r0,r0,#0x00000100
@@ -799,6 +803,7 @@
 	mov m6502a,m6502a,ror#4
 	executeOpcode \cyc
 	.endm
+#endif
 
 	.macro opSBX cyc
 	readMem
