@@ -1870,7 +1870,7 @@ doBRK:						;@ Moved here for alignment
 	push16						;@ Save PC
 
 	encodeP (B+R)				;@ Save P
-	ldr r12,interruptVectors	;@=IRQ_VECTOR
+	ldr r12,interruptVectors+8	;@=IRQ_VECTOR
 	b irqContinue
 ;@----------------------------------------------------------------------------
 outOfCycles:
@@ -1880,12 +1880,12 @@ outOfCycles:
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
-	movne r0,#1
+	movne r0,#8
 	ldrb r1,[m6502optbl,#m6502NMIPin]
 	strb r0,[m6502optbl,#m6502NMIPin]
 	bics r1,r0,r1
 	ldrbne r0,[m6502optbl,#m6502IrqPending]
-	orrne r0,r0,#1
+	orrne r0,r0,r1
 	strbne r0,[m6502optbl,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
@@ -1913,15 +1913,15 @@ m6502CheckIrqs:
 	bics r0,r1,r0
 	beq m6502Go
 ;@ - - - - - - - - - - - - - - - - - - -
-	bic r1,r1,#0x01				;@ Clear NMI
+	bic r1,r1,#0x18				;@ Clear Reset and NMI
 	strb r1,[m6502optbl,#m6502IrqPending]
 //whichIrq:
 #ifdef ARM9
 	clz r0,r0
 	rsb r0,r0,#0x1f
 #else
-	tst r0,#1					;@ NMI?
-	movne r0,#0
+	tst r0,#8					;@ NMI?
+	movne r0,#3
 	bne doNMI
 	tst r0,#4					;@ IRQ
 	movne r0,#2
@@ -1961,9 +1961,11 @@ cliFix:					;@ Cli should be delayed by 1 instruction.
 ;@----------------------------------------------------------------------------
 interruptVectors:
 ;@----------------------------------------------------------------------------
+	.long 0					;@ Dummy
+	.long 0					;@ Dummy
+	.long IRQ_VECTOR		;@ Normal IRQ vector
 	.long NMI_VECTOR		;@ NMI IRQ vector
 	.long RES_VECTOR		;@ Reset vector
-	.long IRQ_VECTOR		;@ Normal IRQ vector
 
 
 #ifndef CPU_N2A03
