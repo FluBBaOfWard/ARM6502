@@ -1864,7 +1864,7 @@ flush:						;@ Update m6502pc & lastbank
 doBRK:						;@ Moved here for alignment
 ;@----------------------------------------------------------------------------
 	mov r11,r11					;@ No$GBA debug!
-	add m6502pc,m6502pc,#2
+	add m6502pc,m6502pc,#1
 	loadLastBank r0
 	sub r0,m6502pc,r0
 	push16						;@ Save PC
@@ -1941,8 +1941,9 @@ irqContinue:
 	push8 r0
 
 	orr cycles,cycles,#CYC_I	;@ Disable IRQ
-;@	bic cycles,cycles,#CYC_D	;@ and decimal mode?
-
+#if defined(W65C02) || defined(CPU_KS5360)
+	bic cycles,cycles,#CYC_D	;@ and decimal mode?
+#endif
 	ldr r0,[m6502optbl,#m6502MemTbl+7*4]
 	ldrh m6502pc,[r0,r12]
 	encodePC					;@ Get IRQ vector
