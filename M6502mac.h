@@ -329,7 +329,7 @@
 
 	.macro doZ2				;@ Zero page			$nn
 	.set AddressMode, _ZP
-	ldrb addy,[h6280pc],#2		;@ Ugly thing for bbr/bbs
+	ldrb addy,[m6502pc],#2		;@ Ugly thing for BBR/BBS
 	.endm
 
 	.macro doZIX			;@ Zero page indexed X	$nn,X
@@ -459,7 +459,7 @@
 	readMemZP
 	tst r0,#1<<(\bit)
 	bne noBBranch
-	ldrbeqs r0,[m6502pc,#-1]
+	ldrsbeq r0,[m6502pc,#-1]
 	addeq m6502pc,m6502pc,r0
 	fetch 6
 	.endm
@@ -469,7 +469,7 @@
 	readMemZP
 	tst r0,#1<<(\bit)
 	bne noBBranch
-	ldrbeqs r0,[m6502pc,#-1]
+	ldrsbeq r0,[m6502pc,#-1]
 	addeq m6502pc,m6502pc,r0
 	cmp r0,#-3
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
@@ -481,7 +481,7 @@
 	readMemZP
 	tst r0,#1<<(\bit)
 	beq noBBranch
-	ldrbnes r0,[m6502pc,#-1]
+	ldrsbne r0,[m6502pc,#-1]
 	addne m6502pc,m6502pc,r0
 	fetch 6
 	.endm
@@ -491,7 +491,7 @@
 	readmemzp
 	tst r0,#1<<(\bit)
 	beq noBBranch
-	ldrbnes r0,[m6502pc,#-1]
+	ldrsbne r0,[m6502pc,#-1]
 	addne m6502pc,m6502pc,r0
 	cmp r0,#-3
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits

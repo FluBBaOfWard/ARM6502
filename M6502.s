@@ -1864,7 +1864,7 @@ flush:						;@ Update m6502pc & lastbank
 doBRK:						;@ Moved here for alignment
 ;@----------------------------------------------------------------------------
 	mov r11,r11					;@ No$GBA debug!
-	add m6502pc,m6502pc,#1
+	add m6502pc,m6502pc,#2
 	loadLastBank r0
 	sub r0,m6502pc,r0
 	push16						;@ Save PC

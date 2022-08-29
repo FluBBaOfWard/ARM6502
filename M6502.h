@@ -10,7 +10,7 @@ typedef struct {
 	u32 m6502ReadTbl[8];
 	u32 m6502WriteTbl[8];
 	u32 m6502MemTbl[8];
-// m6502Regs[8]
+
 	u32 m6502RegNz;
 	u32 m6502RegA;
 	u32 m6502RegX;
@@ -19,7 +19,6 @@ typedef struct {
 	u32 m6502RegCy;
 	u32 m6502RegPc;
 	u32 m6502RegZp;
-	u32 m6502US;
 	u8 m6502IrqPending;
 	u8 m6502NmiPin;
 	u8 m6502Padding[2];
