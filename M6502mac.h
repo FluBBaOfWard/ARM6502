@@ -62,7 +62,7 @@
 	.macro getNextOpcode
 	ldrb r0,[m6502pc],#1
 	.endm
-/*
+#ifdef DEBUG
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYCLE
 	b fetchDebug
@@ -72,7 +72,7 @@
 	sbcs cycles,cycles,#(\count)*CYCLE
 	b fetchDebug
 	.endm
-*/
+#else
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYCLE
 	ldrpl pc,[m6502optbl,r0,lsl#2]
@@ -84,7 +84,7 @@
 	ldrpl pc,[m6502optbl,r0,lsl#2]
 	b outOfCycles
 	.endm
-
+#endif
 	.macro fetch count
 	getNextOpcode
 	executeOpcode \count
