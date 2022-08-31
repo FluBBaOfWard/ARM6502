@@ -62,7 +62,17 @@
 	.macro getNextOpcode
 	ldrb r0,[m6502pc],#1
 	.endm
+/*
+	.macro executeOpcode count
+	subs cycles,cycles,#(\count)*CYCLE
+	b fetchDebug
+	.endm
 
+	.macro executeOpcode_c count
+	sbcs cycles,cycles,#(\count)*CYCLE
+	b fetchDebug
+	.endm
+*/
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYCLE
 	ldrpl pc,[m6502optbl,r0,lsl#2]
