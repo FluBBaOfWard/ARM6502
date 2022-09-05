@@ -952,18 +952,20 @@
 
 	.macro opTRB cyc
 	readMem
+	and r1,r0,m6502a,lsr#24			;@ Flags
 	bic r0,r0,m6502a,lsr#24			;@ Result
 	bic m6502nz,m6502nz,#0xFF
-	orr m6502nz,m6502nz,r0			;@ Z
+	orr m6502nz,m6502nz,r1			;@ Z
 	writeMem
 	fetch \cyc
 	.endm
 
 	.macro opTSB cyc
 	readMem
+	and r1,r0,m6502a,lsr#24			;@ Flags
 	orr r0,r0,m6502a,lsr#24			;@ Result
 	bic m6502nz,m6502nz,#0xFF
-	orr m6502nz,m6502nz,r0			;@ Z
+	orr m6502nz,m6502nz,r1			;@ Z
 	writeMem
 	fetch \cyc
 	.endm
