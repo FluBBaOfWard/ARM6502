@@ -25,6 +25,8 @@
 	.global m6502LoadState
 	.global m6502GetStateSize
 	.global outOfCycles
+	.global memRead8
+	.global memWrite8
 
 	.global m6502OpTable
 
