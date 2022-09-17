@@ -224,7 +224,7 @@
 	.macro readWriteMem				;@ !! Crazy Maniacs use this feature !!
 	.ifeq AddressMode-_ABS
 		readMem8
-#if defined(W65C02) || defined(CPU_KS5360)
+#if defined(W65C02) || defined(W65C02_OLD)
 		readMem8
 #else
 		writeMem8
