@@ -23,6 +23,7 @@
 	.global m6502SaveState
 	.global m6502LoadState
 	.global m6502GetStateSize
+	.global outOfCycles
 	.global memRead8
 	.global memWrite8
 
@@ -2156,7 +2157,7 @@ m6502Reset:				;@ In r0=m6502optbl.
 	stmfd sp!,{r4-r11,lr}
 	mov m6502optbl,r0
 
-	adr r0,returnToCaller
+	ldr r0,=returnToCaller
 	str r0,[m6502optbl,#m6502NextTimeout]
 	str r0,[m6502optbl,#m6502NextTimeout_]
 
