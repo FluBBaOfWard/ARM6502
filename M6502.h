@@ -31,7 +31,7 @@ typedef struct {
 
 extern M6502Core m6502OpTable;
 
-void m6502Reset(int type);
+void m6502Reset(M6502Core *cpu);
 
 /**
  * Saves the state of the cpu to the destination.

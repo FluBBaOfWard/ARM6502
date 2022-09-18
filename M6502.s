@@ -20,11 +20,9 @@
 	.global m6502SetIRQPin
 	.global m6502RestoreAndRunXCycles
 	.global m6502RunXCycles
-	.global m6502CheckIrqs
 	.global m6502SaveState
 	.global m6502LoadState
 	.global m6502GetStateSize
-	.global outOfCycles
 	.global memRead8
 	.global memWrite8
 
@@ -1960,6 +1958,9 @@ doBRK:						;@ Moved here for alignment
 outOfCycles:
 	sub m6502pc,m6502pc,#1
 	ldr pc,[m6502optbl,#m6502NextTimeout]
+returnToCaller:
+	ldmfd sp!,{lr}
+	bx lr
 ;@----------------------------------------------------------------------------
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
@@ -1982,6 +1983,14 @@ m6502SetIRQPin:
 	strb r0,[m6502optbl,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
+cliFix:					;@ Cli should be delayed by 1 instruction.
+;@----------------------------------------------------------------------------
+	ldr r0,[m6502optbl,#m6502OldCycles]
+	ldr r1,[m6502optbl,#m6502NextTimeout_]
+	str r1,[m6502optbl,#m6502NextTimeout]
+	mov r0,r0,lsr#CYC_SHIFT		;@ Don't add any cpu bits.
+	b addR0Cycles
+;@----------------------------------------------------------------------------
 m6502RestoreAndRunXCycles:	;@ r0 = number of cycles to run
 ;@----------------------------------------------------------------------------
 	add r1,m6502optbl,#m6502Regs
@@ -1989,6 +1998,8 @@ m6502RestoreAndRunXCycles:	;@ r0 = number of cycles to run
 ;@----------------------------------------------------------------------------
 m6502RunXCycles:			;@ r0 = number of cycles to run
 ;@----------------------------------------------------------------------------
+	stmfd sp!,{lr}
+addR0Cycles:
 	add cycles,cycles,r0,lsl#CYC_SHIFT
 ;@----------------------------------------------------------------------------
 m6502CheckIrqs:
@@ -2034,15 +2045,6 @@ irqContinue:
 
 	fetch 7
 
-;@----------------------------------------------------------------------------
-cliFix:					;@ Cli should be delayed by 1 instruction.
-;@----------------------------------------------------------------------------
-	ldr r0,[m6502optbl,#m6502OldCycles]
-	ldr r1,[m6502optbl,#m6502NextTimeout_]
-	str r1,[m6502optbl,#m6502NextTimeout]
-	mov r0,r0,lsr#CYC_SHIFT		;@ Don't add any cpu bits.
-
-	b m6502RunXCycles
 ;@----------------------------------------------------------------------------
 interruptVectors:
 ;@----------------------------------------------------------------------------
@@ -2148,10 +2150,15 @@ _xx:	;@ ???					Invalid opcode
 	fetch 1
 
 ;@----------------------------------------------------------------------------
-m6502Reset:				;@ Called by cpuReset (r0-r9 are free to use)
+m6502Reset:				;@ In r0=m6502optbl.
 	.type m6502Reset STT_FUNC
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{lr}
+	stmfd sp!,{r4-r11,lr}
+	mov m6502optbl,r0
+
+	adr r0,returnToCaller
+	str r0,[m6502optbl,#m6502NextTimeout]
+	str r0,[m6502optbl,#m6502NextTimeout_]
 
 ;@---cpu reset
 	mov m6502a,#0
@@ -2171,8 +2178,8 @@ m6502Reset:				;@ Called by cpuReset (r0-r9 are free to use)
 
 	add r0,m6502optbl,#m6502Regs
 	stmia r0,{m6502nz-m6502pc,m6502zpage}
-	ldmfd sp!,{pc}
-
+	ldmfd sp!,{r4-r11,lr}
+	bx lr
 ;@----------------------------------------------------------------------------
 m6502SaveState:			;@ In r0=destination, r1=m6502optbl. Out r0=state size.
 	.type   m6502SaveState STT_FUNC
