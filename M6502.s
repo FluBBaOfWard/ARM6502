@@ -1963,6 +1963,13 @@ returnToCaller:
 	ldmfd sp!,{lr}
 	bx lr
 ;@----------------------------------------------------------------------------
+m6502SetResetPin:			;@ Can only be set
+;@----------------------------------------------------------------------------
+	ldrb r0,[m6502optbl,#m6502IrqPending]
+	orr r0,r0,#0x10
+	strb r0,[m6502optbl,#m6502IrqPending]
+	bx lr
+;@----------------------------------------------------------------------------
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
@@ -2047,13 +2054,17 @@ irqContinue:
 	fetch 7
 
 ;@----------------------------------------------------------------------------
+	.equ IRQ_VECTOR, 0xFFFE		;@ IRQ interrupt vector address
+	.equ RES_VECTOR, 0xFFFC		;@ RESET interrupt vector address
+	.equ NMI_VECTOR, 0xFFFA		;@ NMI interrupt vector address
+;@----------------------------------------------------------------------------
 interruptVectors:
 ;@----------------------------------------------------------------------------
-	.long 0					;@ Dummy
-	.long 0					;@ Dummy
-	.long IRQ_VECTOR		;@ Normal IRQ vector
-	.long NMI_VECTOR		;@ NMI IRQ vector
-	.long RES_VECTOR		;@ Reset vector
+	.long 0						;@ Dummy
+	.long 0						;@ Dummy
+	.long IRQ_VECTOR			;@ Normal IRQ vector
+	.long NMI_VECTOR			;@ NMI IRQ vector
+	.long RES_VECTOR			;@ Reset vector
 
 
 #ifndef CPU_N2A03

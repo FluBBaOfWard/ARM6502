@@ -18,10 +18,6 @@
 	.equ C, 0x01				;@ Carry
 
 ;@----------------------------------------------------------------------------
-	.equ IRQ_VECTOR, 0xFFFE		;@ IRQ interrupt vector address
-	.equ RES_VECTOR, 0xFFFC		;@ RESET interrupt vector address
-	.equ NMI_VECTOR, 0xFFFA		;@ NMI interrupt vector address
-;@----------------------------------------------------------------------------
 
 
 	.macro loadLastBank reg
