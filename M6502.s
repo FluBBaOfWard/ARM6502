@@ -5,10 +5,14 @@
 	.syntax unified
 	.arm
 
-#if !defined(NO_FASTMEM_6502) && defined(NDS)
+#if defined(NDS) && !defined(NO_FASTMEM_6502)
 	.section .itcm						;@ For the NDS ARM9
-#elif !defined(NO_FASTMEM_6502) && defined(GBA)
+#elif defined(GBA)
+	#if !defined(NO_FASTMEM_6502)
 	.section .iwram, "ax", %progbits	;@ For the GBA
+	#else
+	.section .ewram, "ax"				;@ For the GBA
+	#endif
 #else
 	.section .text
 #endif
