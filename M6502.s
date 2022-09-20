@@ -5,10 +5,9 @@
 	.syntax unified
 	.arm
 
-#ifdef NDS
-//	.section .itcm						;@ For the NDS ARM9
-	.section .text						;@ For the NDS
-#elif GBA
+#if !defined(NO_FASTMEM_6502) && defined(NDS)
+	.section .itcm						;@ For the NDS ARM9
+#elif !defined(NO_FASTMEM_6502) && defined(GBA)
 	.section .iwram, "ax", %progbits	;@ For the GBA
 #else
 	.section .text
@@ -16,6 +15,7 @@
 	.align 2
 
 	.global m6502Reset
+	.global m6502SetResetPin
 	.global m6502SetNMIPin
 	.global m6502SetIRQPin
 	.global m6502RestoreAndRunXCycles

@@ -55,11 +55,11 @@ int m6502LoadState(M6502Core *cpu, const void *source);
  */
 int m6502GetStateSize(void);
 
-void m6502SetIRQPin(bool set);
-void m6502SetNMIPin(bool set);
 void m6502RestoreAndRunXCycles(int cycles);
 void m6502RunXCycles(int cycles);
-void m6502CheckIrqs(void);
+void m6502SetResetPin();
+void m6502SetNMIPin(bool set);
+void m6502SetIRQPin(bool set);
 
 #ifdef __cplusplus
 }
