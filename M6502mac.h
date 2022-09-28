@@ -72,13 +72,13 @@
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYCLE
 	ldrpl pc,[m6502optbl,r0,lsl#2]
-	b outOfCycles
+	b m6502OutOfCycles
 	.endm
 
 	.macro executeOpcode_c count
 	sbcs cycles,cycles,#(\count)*CYCLE
 	ldrpl pc,[m6502optbl,r0,lsl#2]
-	b outOfCycles
+	b m6502OutOfCycles
 	.endm
 #endif
 	.macro fetch count

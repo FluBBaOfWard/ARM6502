@@ -27,7 +27,7 @@
 	.global m6502SaveState
 	.global m6502LoadState
 	.global m6502GetStateSize
-	.global outOfCycles
+	.global m6502OutOfCycles
 	.global memRead8
 	.global memWrite8
 
@@ -36,7 +36,7 @@
 
 #ifdef DEBUG
 fetchDebug:
-	bmi outOfCycles
+	bmi m6502OutOfCycles
 	sub m6502pc,m6502pc,#1
 
 	encodeP (0)
@@ -1960,7 +1960,7 @@ doBRK:						;@ Moved here for alignment
 	ldr r12,interruptVectors+8	;@=IRQ_VECTOR
 	b irqContinue
 ;@----------------------------------------------------------------------------
-outOfCycles:
+m6502OutOfCycles:
 	sub m6502pc,m6502pc,#1
 	ldr pc,[m6502optbl,#m6502NextTimeout]
 returnToCaller:
