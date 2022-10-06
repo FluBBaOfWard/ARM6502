@@ -50,7 +50,7 @@ fetchDebug:
 	.align 2
 debugContinue:
 	ldrb r0,[m6502pc],#1
-	ldr pc,[m6502optbl,r0,lsl#2]
+	ldr pc,[m6502ptr,r0,lsl#2]
 	.pool
 #endif
 ;@----------------------------------------------------------------------------
@@ -598,7 +598,7 @@ _4C:	;@ JMP $nnnn
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502pc]
 	ldrb m6502pc,[m6502pc,#1]
-	add r2,m6502optbl,#m6502MemTbl
+	add r2,m6502ptr,#m6502MemTbl
 	and r1,m6502pc,#0xE0
 //	encodePC
 	ldr r1,[r2,r1,lsr#3]		;@ In: m6502pc.
@@ -686,9 +686,9 @@ _58:	;@ CLI
 ;@	b m6502CheckIrqs			;@ Fixes?
 
 	ldr r0,=cliFix				;@ Check IRQ lines after next instructions
-	str r0,[m6502optbl,#m6502NextTimeout]
+	str r0,[m6502ptr,#m6502NextTimeout]
 	eatCycles 2
-	str cycles,[m6502optbl,#m6502OldCycles]	;@ Save old cycles so we can use them later on.
+	str cycles,[m6502ptr,#m6502OldCycles]	;@ Save old cycles so we can use them later on.
 	clearCycles					;@ Clear cycles, save cpu bits
 
 	fetch 0
@@ -936,7 +936,7 @@ _7B:	;@ RRA $nnnn,Y
 _7C:	;@ JMP ($nnnn,X)
 ;@----------------------------------------------------------------------------
 	doAIX
-	add r1,m6502optbl,m6502MemTbl
+	add r1,m6502ptr,m6502MemTbl
 	and r2,addy,#0xE000
 	ldr r1,[r1,r2,lsr#11]
 	ldrb m6502pc,[r1,addy]!
@@ -1876,42 +1876,42 @@ memRead8ABS:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 memRead8:					;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
 memRead8IIX:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 	doIIX
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
 memRead8IIY:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 	doIIY
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
 memRead8ZPI:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 	doZPI
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
 memRead8AIY:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 	doAIY
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
 memRead8AIX:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 	doAIX
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
@@ -1921,7 +1921,7 @@ memRead8AIX:				;@ Mem read ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
 memWrite8:					;@ Mem write ($0000-$FFFF)
 ;@----------------------------------------------------------------------------
-	add r2,m6502optbl,#m6502WriteTbl
+	add r2,m6502ptr,#m6502WriteTbl
 	and r1,addy,#0xE000
 	ldr pc,[r2,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
 ;@----------------------------------------------------------------------------
@@ -1932,7 +1932,7 @@ reTranslate6502PCToOffset:		;@ In = m6502pc+bank, out = r0 bank offset
 ;@----------------------------------------------------------------------------
 translate6502PCToOffset:	;@ In = m6502pc, out = r0 bank offset
 ;@----------------------------------------------------------------------------
-	add r1,m6502optbl,#m6502MemTbl
+	add r1,m6502ptr,#m6502MemTbl
 	and r0,m6502pc,#0xE000
 	ldr r0,[r1,r0,lsr#11]
 	storeLastBank r0
@@ -1962,50 +1962,50 @@ doBRK:						;@ Moved here for alignment
 ;@----------------------------------------------------------------------------
 m6502OutOfCycles:
 	sub m6502pc,m6502pc,#1
-	ldr pc,[m6502optbl,#m6502NextTimeout]
+	ldr pc,[m6502ptr,#m6502NextTimeout]
 returnToCaller:
 	ldmfd sp!,{lr}
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502SetResetPin:			;@ Can only be set
 ;@----------------------------------------------------------------------------
-	ldrb r0,[m6502optbl,#m6502IrqPending]
+	ldrb r0,[m6502ptr,#m6502IrqPending]
 	orr r0,r0,#0x10
-	strb r0,[m6502optbl,#m6502IrqPending]
+	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
 	movne r0,#8
-	ldrb r1,[m6502optbl,#m6502NMIPin]
-	strb r0,[m6502optbl,#m6502NMIPin]
+	ldrb r1,[m6502ptr,#m6502NMIPin]
+	strb r0,[m6502ptr,#m6502NMIPin]
 	bics r1,r0,r1
-	ldrbne r0,[m6502optbl,#m6502IrqPending]
+	ldrbne r0,[m6502ptr,#m6502IrqPending]
 	orrne r0,r0,r1
-	strbne r0,[m6502optbl,#m6502IrqPending]
+	strbne r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502SetIRQPin:
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
-	ldrb r0,[m6502optbl,#m6502IrqPending]
+	ldrb r0,[m6502ptr,#m6502IrqPending]
 	biceq r0,r0,#0x04
 	orrne r0,r0,#0x04
-	strb r0,[m6502optbl,#m6502IrqPending]
+	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
 cliFix:					;@ Cli should be delayed by 1 instruction.
 ;@----------------------------------------------------------------------------
-	ldr r0,[m6502optbl,#m6502OldCycles]
-	ldr r1,[m6502optbl,#m6502NextTimeout_]
-	str r1,[m6502optbl,#m6502NextTimeout]
+	ldr r0,[m6502ptr,#m6502OldCycles]
+	adr r1,returnToCaller
+	str r1,[m6502ptr,#m6502NextTimeout]
 	mov r0,r0,lsr#CYC_SHIFT		;@ Don't add any cpu bits.
 	b addR0Cycles
 ;@----------------------------------------------------------------------------
 m6502RestoreAndRunXCycles:	;@ r0 = number of cycles to run
 ;@----------------------------------------------------------------------------
-	add r1,m6502optbl,#m6502Regs
+	add r1,m6502ptr,#m6502Regs
 	ldmia r1,{m6502nz-m6502pc,m6502zpage}	;@ Restore M6502 state
 ;@----------------------------------------------------------------------------
 m6502RunXCycles:			;@ r0 = number of cycles to run
@@ -2015,13 +2015,13 @@ addR0Cycles:
 	add cycles,cycles,r0,lsl#CYC_SHIFT
 ;@----------------------------------------------------------------------------
 m6502CheckIrqs:
-	ldrb r1,[m6502optbl,#m6502IrqPending]
+	ldrb r1,[m6502ptr,#m6502IrqPending]
 	and r0,cycles,#CYC_I		;@ CYC_I = 4
 	bics r0,r1,r0
 	beq m6502Go
 ;@ - - - - - - - - - - - - - - - - - - -
 	bic r1,r1,#0x18				;@ Clear Reset and NMI
-	strb r1,[m6502optbl,#m6502IrqPending]
+	strb r1,[m6502ptr,#m6502IrqPending]
 //whichIrq:
 #ifdef ARM9
 	clz r0,r0
@@ -2051,7 +2051,7 @@ irqContinue:
 #if defined(W65C02) || defined(W65C02_OLD)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
-	ldr r0,[m6502optbl,#m6502MemTbl+7*4]
+	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
 	ldrh m6502pc,[r0,r12]
 	encodePC					;@ Get IRQ vector
 
@@ -2166,15 +2166,14 @@ _xx:	;@ ???					Invalid opcode
 	fetch 1
 
 ;@----------------------------------------------------------------------------
-m6502Reset:				;@ In r0=m6502optbl.
+m6502Reset:				;@ In r0=m6502ptr.
 	.type m6502Reset STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4-r11,lr}
-	mov m6502optbl,r0
+	mov m6502ptr,r0
 
 	ldr r0,=returnToCaller
-	str r0,[m6502optbl,#m6502NextTimeout]
-	str r0,[m6502optbl,#m6502NextTimeout_]
+	str r0,[m6502ptr,#m6502NextTimeout]
 
 ;@---cpu reset
 	mov m6502a,#0
@@ -2182,30 +2181,30 @@ m6502Reset:				;@ In r0=m6502optbl.
 	mov m6502y,#0
 	mov m6502nz,#0
 	ldr m6502sp,=0xFF000001
-	ldr m6502zpage,[m6502optbl,#m6502MemTbl]
+	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
 	mov cycles,#CYC_I			;@ V=0, D=0, C=0, I=1 disable IRQ.
 
-	str m6502a,[m6502optbl,#m6502IrqPending]	;@ Irq pending reset
+	str m6502a,[m6502ptr,#m6502IrqPending]	;@ Irq pending reset
 
-	ldr r0,[m6502optbl,#m6502MemTbl+7*4]
+	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
 	ldr r1,=RES_VECTOR
 	ldrh m6502pc,[r0,r1]
 	encodePC					;@ Get RESET vector
 
-	add r0,m6502optbl,#m6502Regs
+	add r0,m6502ptr,#m6502Regs
 	stmia r0,{m6502nz-m6502pc,m6502zpage}
 	ldmfd sp!,{r4-r11,lr}
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502SaveState:			;@ In r0=destination, r1=m6502optbl. Out r0=state size.
+m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 	.type   m6502SaveState STT_FUNC
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{r4,m6502optbl,lr}
+	stmfd sp!,{r4,m6502ptr,lr}
 
 	sub r4,r0,#m6502Regs
-	mov m6502optbl,r1
+	mov m6502ptr,r1
 
-	add r1,m6502optbl,#m6502Regs
+	add r1,m6502ptr,#m6502Regs
 	mov r2,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bl memcpy
 
@@ -2215,25 +2214,25 @@ m6502SaveState:			;@ In r0=destination, r1=m6502optbl. Out r0=state size.
 	sub r0,r0,r2
 	str r0,[r4,#m6502RegPc]					;@ Normal m6502pc
 
-	ldmfd sp!,{r4,m6502optbl,lr}
+	ldmfd sp!,{r4,m6502ptr,lr}
 	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502LoadState:			;@ In r0=m6502optbl, r1=source. Out r0=state size.
+m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 	.type   m6502LoadState STT_FUNC
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{m6502pc,m6502optbl,lr}
+	stmfd sp!,{m6502pc,m6502ptr,lr}
 
-	mov m6502optbl,r0
-	add r0,m6502optbl,#m6502Regs
+	mov m6502ptr,r0
+	add r0,m6502ptr,#m6502Regs
 	mov r2,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bl memcpy
 
-	ldr m6502pc,[m6502optbl,#m6502RegPc]	;@ Normal m6502pc
+	ldr m6502pc,[m6502ptr,#m6502RegPc]	;@ Normal m6502pc
 	encodePC
-	str m6502pc,[m6502optbl,#m6502RegPc]	;@ Rewrite offseted m6502pc
+	str m6502pc,[m6502ptr,#m6502RegPc]	;@ Rewrite offseted m6502pc
 
-	ldmfd sp!,{m6502pc,m6502optbl,lr}
+	ldmfd sp!,{m6502pc,m6502ptr,lr}
 ;@----------------------------------------------------------------------------
 m6502GetStateSize:		;@ Out r0=state size.
 	.type   m6502GetStateSize STT_FUNC
@@ -2270,16 +2269,15 @@ m6502OpTable:
 	.space 8*4	;@ MemTbl
 	.space 8*4	;@ ReadTbl
 	.space 8*4	;@ WriteTbl
-m6502StateStart:
+
 	;@ Group these together for save/loadstate
 	.space 8*4	;@ cpuRegs (nz,a,x,y,sp,cycles,pc,zp)
 	.byte 0 	;@ m6502IrqPending
 	.byte 0 	;@ m6502NMIPin
 	.space 2	;@ padding
-m6502StateEnd:
+
 	.long 0		;@ LastBank:		Last memmap added to PC (used to calculate current PC)
 	.long 0 	;@ OldCycles:		Backup of cycles
-	.long 0 	;@ NextTimeout_:	Backup of nexttimeout
 	.long 0		;@ NextTimeout:		Jump here when cycles runs out
 
 ;@----------------------------------------------------------------------------

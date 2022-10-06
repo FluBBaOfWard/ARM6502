@@ -7,13 +7,13 @@
 	m6502sp		.req r7			;@ Bits 24-31=SP, bit 0=1.
 	cycles		.req r8
 	m6502pc		.req r9
-	m6502optbl	.req r10
+	m6502ptr	.req r10
 	m6502zpage	.req r11		;@ ZeroPage RAM ptr
 	addy		.req r12		;@ Keep this at r12 (scratch for APCS)
 
 ;@----------------------------------------------------------------------------
 	.equ CYC_SHIFT, 8
-	.equ CYCLE, 1<<CYC_SHIFT	;@ one cycle
+	.equ CYCLE, 1<<CYC_SHIFT	;@ One cycle
 	.equ CYC_MASK, CYCLE-1		;@ Mask
 ;@----------------------------------------------------------------------------
 ;@ cycle flags- (stored in cycles reg for speed)
@@ -29,6 +29,7 @@ m6502Opz:			.space 256*4
 m6502MemTbl:		.space 8*4
 m6502ReadTbl:		.space 8*4
 m6502WriteTbl:		.space 8*4
+m6502StateStart:
 m6502Regs:
 m6502RegNz:			.long 0
 m6502RegA:			.long 0
@@ -41,10 +42,10 @@ m6502RegZp:			.long 0
 m6502IrqPending:	.byte 0
 m6502NMIPin:		.byte 0
 m6502Padding:		.space 2
+m6502StateEnd:
 
 m6502LastBank:		.long 0
 m6502OldCycles:		.long 0
-m6502NextTimeout_:	.long 0
 m6502NextTimeout:	.long 0
 m6502Size:
 

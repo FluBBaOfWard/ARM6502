@@ -21,11 +21,11 @@
 
 
 	.macro loadLastBank reg
-	ldr \reg,[m6502optbl,#m6502LastBank]
+	ldr \reg,[m6502ptr,#m6502LastBank]
 	.endm
 
 	.macro storeLastBank reg
-	str \reg,[m6502optbl,#m6502LastBank]
+	str \reg,[m6502ptr,#m6502LastBank]
 	.endm
 
 	.macro encodePC				;@ Translate m6502pc from M6502 PC to rom offset
@@ -71,13 +71,13 @@
 #else
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYCLE
-	ldrpl pc,[m6502optbl,r0,lsl#2]
+	ldrpl pc,[m6502ptr,r0,lsl#2]
 	b m6502OutOfCycles
 	.endm
 
 	.macro executeOpcode_c count
 	sbcs cycles,cycles,#(\count)*CYCLE
-	ldrpl pc,[m6502optbl,r0,lsl#2]
+	ldrpl pc,[m6502ptr,r0,lsl#2]
 	b m6502OutOfCycles
 	.endm
 #endif
@@ -100,7 +100,7 @@
 	.endm
 
 /*	.macro readMem8
-	add r0,m6502optbl,#m6502ReadTbl
+	add r0,m6502ptr,#m6502ReadTbl
 	and r1,addy,#0xE000
 	mov lr,pc
 	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r1=addy&0xe000
@@ -185,7 +185,7 @@
 
 
 /*	.macro writeMem8
-	add r2,m6502optbl,#m6502WriteTbl
+	add r2,m6502ptr,#m6502WriteTbl
 	and r1,addy,#0xE000
 	mov lr,pc
 	ldr pc,[r2,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?),r1=addy&0xe000(for CDRAM_W)

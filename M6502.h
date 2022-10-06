@@ -25,7 +25,6 @@ typedef struct {
 
 	void *m6502LastBank;
 	int m6502OldCycles;
-	void *m6502NextTimeout_;
 	void *m6502NextTimeout;
 } M6502Core;
 
