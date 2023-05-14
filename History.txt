@@ -11,7 +11,7 @@ V0.2.1 - 2022-09-20 (FluBBa)
 
 V0.2.0 - 2022-09-17 (FluBBa)
 	Added 65C02 opcodes.
-	Added support for N2A03 (no decimal mode).
+	Added support for RP2A03 (no decimal mode).
 
 V0.1.5 - 2021-02-28 (FluBBa)
 	Added load/save state.

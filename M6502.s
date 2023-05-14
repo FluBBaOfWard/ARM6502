@@ -2034,7 +2034,7 @@ irqContinue:
 	push8 r0
 
 	orr cycles,cycles,#CYC_I	;@ Disable IRQ
-#if !defined(CPU_N2A03)
+#if !defined(CPU_RP2A03)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
 	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
@@ -2069,7 +2069,7 @@ interruptVectors:
 	.long RES_VECTOR			;@ Reset vector
 
 
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 ;@----------------------------------------------------------------------------
 opADC_Dec:
 ;@----------------------------------------------------------------------------

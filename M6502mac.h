@@ -374,7 +374,7 @@
 	.endm
 
 	.macro opADC cyc
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	tst cycles,#CYC_D
 	bne opADC_Dec
 #endif
@@ -388,7 +388,7 @@
 	executeOpcode_c \cyc
 	.endm
 
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	.macro opADCD cyc
 	movs r1,cycles,lsr#1        	;@ Get C
 	adc m6502nz,r0,m6502a,lsr#24	;@ Z is set with normal addition
@@ -430,7 +430,7 @@
 	tst r0,#0x40000000
 	biceq cycles,cycles,#CYC_V		;@ V
 	mov m6502nz,m6502a,asr#24		;@ NZ
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	tst cycles,#CYC_D
 	bne .F0
 #endif
@@ -626,7 +626,7 @@
 	add r0,r0,#0x01
 	and r0,r0,#0xFF					;@ This is only needed for decimal mode.
 	writeMem
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	tst cycles,#CYC_D
 	bne opSBC_Dec
 #endif
@@ -756,7 +756,7 @@
 	orr m6502nz,r0,r0,lsl#24		;@ NZ
 	adc cycles,cycles,cycles		;@ Set C
 	writeMem
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	tst cycles,#CYC_D
 	bne opADC_Dec
 #endif
@@ -777,7 +777,7 @@
 	.endm
 
 	.macro opSBC cyc
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	tst cycles,#CYC_D
 	bne opSBC_Dec
 #endif
@@ -791,7 +791,7 @@
 	executeOpcode_c \cyc
 	.endm
 
-#ifndef CPU_N2A03
+#ifndef CPU_RP2A03
 	.macro opSBCD cyc
 	movs r1,cycles,lsr#1			;@ Get C
 	subcc r0,r0,#0x00000100
