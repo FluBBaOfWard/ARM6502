@@ -12,4 +12,3 @@ ARM6502 To do
 	Optimize set NMI pin.
 	Optimize NMI/IRQ check.
 	Make core completly objectified.
-

@@ -18,6 +18,7 @@
 #endif
 	.align 2
 
+	.global m6502Init
 	.global m6502Reset
 	.global m6502SetResetPin
 	.global m6502SetNMIPin
@@ -30,9 +31,6 @@
 	.global m6502OutOfCycles
 	.global memRead8
 	.global memWrite8
-
-	.global m6502OpTable
-
 
 #ifdef DEBUG
 fetchDebug:
@@ -1948,18 +1946,6 @@ flush:						;@ Update m6502pc & lastbank
 	bx lr
 
 ;@----------------------------------------------------------------------------
-doBRK:						;@ Moved here for alignment
-;@----------------------------------------------------------------------------
-	mov r11,r11					;@ No$GBA debug!
-	add m6502pc,m6502pc,#2
-	loadLastBank r0
-	sub r0,m6502pc,r0
-	push16						;@ Save PC
-
-	encodeP (B+R)				;@ Save P
-	ldr r12,interruptVectors+8	;@=IRQ_VECTOR
-	b irqContinue
-;@----------------------------------------------------------------------------
 m6502OutOfCycles:
 	sub m6502pc,m6502pc,#1
 	ldr pc,[m6502ptr,#m6502NextTimeout]
@@ -2048,7 +2034,7 @@ irqContinue:
 	push8 r0
 
 	orr cycles,cycles,#CYC_I	;@ Disable IRQ
-#if defined(W65C02) || defined(W65C02_OLD)
+#if !defined(CPU_N2A03)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
 	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
@@ -2056,6 +2042,18 @@ irqContinue:
 	encodePC					;@ Get IRQ vector
 
 	fetch 7
+;@----------------------------------------------------------------------------
+doBRK:						;@ Moved here for alignment
+;@----------------------------------------------------------------------------
+	mov r11,r11					;@ No$GBA debug!
+	add m6502pc,m6502pc,#1
+	loadLastBank r0
+	sub r0,m6502pc,r0
+	push16						;@ Save PC
+
+	encodeP (B+R)				;@ Save P
+	ldr r12,interruptVectors+8	;@=IRQ_VECTOR
+	b irqContinue
 
 ;@----------------------------------------------------------------------------
 	.equ IRQ_VECTOR, 0xFFFE		;@ IRQ interrupt vector address
@@ -2089,6 +2087,8 @@ opSBC_Dec:
 	.section .text				;@ For everything else
 #endif
 ;@----------------------------------------------------------------------------
+_xx:	;@ ???					Invalid opcode
+;@----------------------------------------------------------------------------
 #if defined(W65C02) || defined(W65C02_OLD)
 _03:
 _0B:
@@ -2120,7 +2120,6 @@ _E3:
 _EB:
 _F3:
 _FB:
-#endif
 #if defined(W65C02_OLD)
 _07:
 _0F:
@@ -2157,14 +2156,20 @@ _EF:
 _F7:
 _FF:
 #endif
-_xx:	;@ ???					Invalid opcode
-;@----------------------------------------------------------------------------
 	mov r11,r11					;@ No$GBA debugg!
 /*
  	Do some debugging!
  */
 	fetch 1
+#endif
 
+;@----------------------------------------------------------------------------
+m6502Init:				;@ In r0=m6502ptr.
+	.type m6502Init STT_FUNC
+;@----------------------------------------------------------------------------
+	adr r1,m6502OpTable
+	mov r2,#256*4
+	b memcpy
 ;@----------------------------------------------------------------------------
 m6502Reset:				;@ In r0=m6502ptr.
 	.type m6502Reset STT_FUNC
@@ -2209,10 +2214,10 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 	bl memcpy
 
 	;@ Convert copied PC to not offseted.
-	ldr r0,[r4,#m6502RegPc]					;@ Offsetted m6502pc
+	ldr r0,[r4,#m6502RegPC]					;@ Offsetted m6502pc
 	loadLastBank r2
 	sub r0,r0,r2
-	str r0,[r4,#m6502RegPc]					;@ Normal m6502pc
+	str r0,[r4,#m6502RegPC]					;@ Normal m6502pc
 
 	ldmfd sp!,{r4,m6502ptr,lr}
 	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
@@ -2228,9 +2233,9 @@ m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 	mov r2,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bl memcpy
 
-	ldr m6502pc,[m6502ptr,#m6502RegPc]	;@ Normal m6502pc
+	ldr m6502pc,[m6502ptr,#m6502RegPC]	;@ Normal m6502pc
 	encodePC
-	str m6502pc,[m6502ptr,#m6502RegPc]	;@ Rewrite offseted m6502pc
+	str m6502pc,[m6502ptr,#m6502RegPC]	;@ Rewrite offseted m6502pc
 
 	ldmfd sp!,{m6502pc,m6502ptr,lr}
 ;@----------------------------------------------------------------------------
@@ -2239,14 +2244,6 @@ m6502GetStateSize:		;@ Out r0=state size.
 ;@----------------------------------------------------------------------------
 	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
 	bx lr
-;@----------------------------------------------------------------------------
-#ifdef NDS
-	.section .dtcm, "ax", %progbits			;@ For the NDS
-#elif GBA
-	.section .iwram, "ax", %progbits		;@ For the GBA
-#else
-	.section .text
-#endif
 ;@----------------------------------------------------------------------------
 m6502OpTable:
 	.long _00,_01,_02,_03,_04,_05,_06,_07,_08,_09,_0A,_0B,_0C,_0D,_0E,_0F
@@ -2265,21 +2262,6 @@ m6502OpTable:
 	.long _D0,_D1,_D2,_D3,_D4,_D5,_D6,_D7,_D8,_D9,_DA,_DB,_DC,_DD,_DE,_DF
 	.long _E0,_E1,_E2,_E3,_E4,_E5,_E6,_E7,_E8,_E9,_EA,_EB,_EC,_ED,_EE,_EF
 	.long _F0,_F1,_F2,_F3,_F4,_F5,_F6,_F7,_F8,_F9,_FA,_FB,_FC,_FD,_FE,_FF
-
-	.space 8*4	;@ MemTbl
-	.space 8*4	;@ ReadTbl
-	.space 8*4	;@ WriteTbl
-
-	;@ Group these together for save/loadstate
-	.space 8*4	;@ cpuRegs (nz,a,x,y,sp,cycles,pc,zp)
-	.byte 0 	;@ m6502IrqPending
-	.byte 0 	;@ m6502NMIPin
-	.space 2	;@ padding
-
-	.long 0		;@ LastBank:		Last memmap added to PC (used to calculate current PC)
-	.long 0 	;@ OldCycles:		Backup of cycles
-	.long 0		;@ NextTimeout:		Jump here when cycles runs out
-
 ;@----------------------------------------------------------------------------
 	.end
 #endif // #ifdef __arm__

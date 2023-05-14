@@ -5,7 +5,7 @@
 	m6502x		.req r5			;@ Bits  0-23=0
 	m6502y		.req r6			;@ Bits  0-23=0
 	m6502sp		.req r7			;@ Bits 24-31=SP, bit 0=1.
-	cycles		.req r8
+	cycles		.req r8			;@ Also VDIC flags
 	m6502pc		.req r9
 	m6502ptr	.req r10
 	m6502zpage	.req r11		;@ ZeroPage RAM ptr
@@ -24,21 +24,21 @@
 	.equ CYC_V, 0x40			;@ Overflow bit
 ;@----------------------------------------------------------------------------
 
-	.struct 0					;@ Changes section so make sure it's set before real code.
+	.struct 0					;@ Changes section so make sure it is set before real code.
 m6502Opz:			.space 256*4
 m6502MemTbl:		.space 8*4
 m6502ReadTbl:		.space 8*4
 m6502WriteTbl:		.space 8*4
 m6502StateStart:
 m6502Regs:
-m6502RegNz:			.long 0
+m6502RegNZ:			.long 0
 m6502RegA:			.long 0
 m6502RegX:			.long 0
 m6502RegY:			.long 0
-m6502RegSp:			.long 0
-m6502RegCy:			.long 0
-m6502RegPc:			.long 0
-m6502RegZp:			.long 0
+m6502RegSP:			.long 0
+m6502Cycles:		.long 0
+m6502RegPC:			.long 0
+m6502ZeroPage:		.long 0
 m6502IrqPending:	.byte 0
 m6502NMIPin:		.byte 0
 m6502Padding:		.space 2
@@ -47,6 +47,10 @@ m6502StateEnd:
 m6502LastBank:		.long 0
 m6502OldCycles:		.long 0
 m6502NextTimeout:	.long 0
+#ifdef DEBUG
+m6502BRKCount:		.long 0
+m6502BadOpCount:	.long 0
+#endif
 m6502Size:
 
 ;@----------------------------------------------------------------------------

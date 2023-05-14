@@ -6,29 +6,33 @@ extern "C" {
 #endif
 
 typedef struct {
-	u32 m6502Opz[256];
-	u32 m6502ReadTbl[8];
-	u32 m6502WriteTbl[8];
-	u32 m6502MemTbl[8];
+	void *opz[256];
+	void *readTbl[8];
+	void *writeTbl[8];
+	u32 memTbl[8];
 
-	u32 m6502RegNz;
-	u32 m6502RegA;
-	u32 m6502RegX;
-	u32 m6502RegY;
-	u32 m6502RegSp;
-	u32 m6502RegCy;
-	u32 m6502RegPc;
-	u32 m6502RegZp;
-	u8 m6502IrqPending;
-	u8 m6502NmiPin;
-	u8 m6502Padding[2];
+	u32 regNz;
+	u32 regA;
+	u32 regX;
+	u32 regY;
+	u32 regSp;
+	u32 cycles;
+	u32 regPc;
+	u32 zeroPage;
+	u8 irqPending;
+	u8 nmiPin;
+	u8 padding[2];
 
-	void *m6502LastBank;
-	int m6502OldCycles;
-	void *m6502NextTimeout;
+	void *lastBank;
+	int oldCycles;
+	void *nextTimeout;
+#ifdef DEBUG
+	u32 brkCount;
+	u32 badOpCount;
+#endif
 } M6502Core;
 
-extern M6502Core m6502OpTable;
+void m6502Init(M6502Core *cpu);
 
 void m6502Reset(M6502Core *cpu);
 
