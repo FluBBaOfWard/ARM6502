@@ -1,7 +1,6 @@
 ARM6502 To do
 --------------
 
-	Remove readMemZPA macro plus memRead8ZPI code?
 	Add define for 65c02 to handle:
 	* Read/modify write.
 	* Decimal calculation.

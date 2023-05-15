@@ -123,16 +123,16 @@
 	bl memRead8IIY
 	.endm
 
-	.macro readMemZPA
-	bl memRead8ZPI
-	.endm
-
 	.macro readMemAIY
 	bl memRead8AIY
 	.endm
 
 	.macro readMemAIX
 	bl memRead8AIX
+	.endm
+
+	.macro readMemZInd
+	bl memRead8ZInd
 	.endm
 
 	.macro readMemZP
