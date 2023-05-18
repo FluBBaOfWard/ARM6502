@@ -2205,7 +2205,7 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 	mov m6502ptr,r1
 
 	add r1,m6502ptr,#m6502Regs
-	mov r2,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
+	mov r2,#m6502StateSize					;@ Right now 0x24
 	bl memcpy
 
 	;@ Convert copied PC to not offseted.
@@ -2215,7 +2215,7 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 	str r0,[r4,#m6502RegPC]					;@ Normal m6502pc
 
 	ldmfd sp!,{r4,m6502ptr,lr}
-	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
+	mov r0,#m6502StateSize					;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
@@ -2225,7 +2225,7 @@ m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 
 	mov m6502ptr,r0
 	add r0,m6502ptr,#m6502Regs
-	mov r2,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
+	mov r2,#m6502StateSize	;@ Right now 0x24
 	bl memcpy
 
 	ldr m6502pc,[m6502ptr,#m6502RegPC]	;@ Normal m6502pc
@@ -2237,7 +2237,7 @@ m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 m6502GetStateSize:		;@ Out r0=state size.
 	.type   m6502GetStateSize STT_FUNC
 ;@----------------------------------------------------------------------------
-	mov r0,#m6502StateEnd-m6502StateStart	;@ Right now 0x24
+	mov r0,#m6502StateSize				;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502OpTable:

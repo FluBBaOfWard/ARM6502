@@ -52,5 +52,6 @@ m6502BRKCount:		.long 0
 m6502BadOpCount:	.long 0
 #endif
 m6502Size:
+m6502StateSize = m6502StateEnd-m6502StateStart
 
 ;@----------------------------------------------------------------------------
