@@ -869,7 +869,7 @@
 	mov addy,addy,ror#24
 	writeMem
 
-	and m6502sp,m6502x,m6502a,lsr#24
+	and m6502sp,m6502x,m6502a
 	orr m6502sp,m6502sp,#1
 	fetch \cyc
 	.endm

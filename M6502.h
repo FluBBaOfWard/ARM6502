@@ -9,7 +9,7 @@ typedef struct {
 	void *opz[256];
 	void *readTbl[8];
 	void *writeTbl[8];
-	u32 memTbl[8];
+	u32 *memTbl[8];
 
 	u32 regNz;
 	u32 regA;
@@ -59,6 +59,7 @@ int m6502LoadState(M6502Core *cpu, const void *source);
 int m6502GetStateSize(void);
 
 void m6502RestoreAndRunXCycles(int cycles);
+void m6502RunXCyclesC(int cycles);
 void m6502RunXCycles(int cycles);
 void m6502SetResetPin();
 void m6502SetNMIPin(bool set);

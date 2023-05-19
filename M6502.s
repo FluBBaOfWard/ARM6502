@@ -1940,13 +1940,6 @@ flush:						;@ Update m6502pc & lastbank
 	bx lr
 
 ;@----------------------------------------------------------------------------
-m6502OutOfCycles:
-	sub m6502pc,m6502pc,#1
-	ldr pc,[m6502ptr,#m6502NextTimeout]
-returnToCaller:
-	ldmfd sp!,{lr}
-	bx lr
-;@----------------------------------------------------------------------------
 m6502SetResetPin:			;@ Can only be set
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502ptr,#m6502IrqPending]
@@ -1980,8 +1973,15 @@ cliFix:					;@ Cli should be delayed by 1 instruction.
 	ldr r0,[m6502ptr,#m6502OldCycles]
 	adr r1,returnToCaller
 	str r1,[m6502ptr,#m6502NextTimeout]
-	mov r0,r0,lsr#CYC_SHIFT		;@ Don't add any cpu bits.
+	mov r0,r0,asr#CYC_SHIFT		;@ Don't add any cpu bits.
 	b addR0Cycles
+;@----------------------------------------------------------------------------
+m6502OutOfCycles:
+	sub m6502pc,m6502pc,#1
+	ldr pc,[m6502ptr,#m6502NextTimeout]
+returnToCaller:
+	ldmfd sp!,{lr}
+	bx lr
 ;@----------------------------------------------------------------------------
 m6502RestoreAndRunXCycles:	;@ r0 = number of cycles to run
 ;@----------------------------------------------------------------------------
@@ -2000,7 +2000,7 @@ m6502CheckIrqs:
 	bics r0,r1,r0
 	beq m6502Go
 ;@ - - - - - - - - - - - - - - - - - - -
-	bic r1,r1,#0x18				;@ Clear Reset and NMI
+	bic r1,r1,#0x18				;@ Clear Reset and NMI pending
 	strb r1,[m6502ptr,#m6502IrqPending]
 //whichIrq:
 #ifdef ARM9
@@ -2156,7 +2156,18 @@ _FF:
  */
 	fetch 1
 #endif
-
+;@----------------------------------------------------------------------------
+returnToC:
+	add r0,m6502ptr,#m6502Regs
+	stmia r0,{m6502nz-m6502pc,m6502zpage}	;@ Save M6502 state
+	ldmfd sp!,{r4-r11,lr}
+	bx lr
+;@----------------------------------------------------------------------------
+m6502RunXCyclesC:	;@ r0 = number of cycles to run
+;@----------------------------------------------------------------------------
+	stmfd sp!,{r4-r11,lr}
+	adr lr,returnToC
+	b m6502RunXCycles
 ;@----------------------------------------------------------------------------
 m6502Init:				;@ In r0=m6502ptr.
 	.type m6502Init STT_FUNC
@@ -2180,7 +2191,7 @@ m6502Reset:				;@ In r0=m6502ptr.
 	mov m6502x,#0
 	mov m6502y,#0
 	mov m6502nz,#0
-	ldr m6502sp,=0xFF000001
+	ldr m6502sp,=0xFD000001		;@ 0x100-3
 	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
 	mov cycles,#CYC_I			;@ V=0, D=0, C=0, I=1 disable IRQ.
 
@@ -2228,6 +2239,8 @@ m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 	mov r2,#m6502StateSize	;@ Right now 0x24
 	bl memcpy
 
+	ldr r0,[m6502ptr,#m6502MemTbl]
+	str r0,[m6502ptr,#m6502ZeroPage]
 	ldr m6502pc,[m6502ptr,#m6502RegPC]	;@ Normal m6502pc
 	encodePC
 	str m6502pc,[m6502ptr,#m6502RegPC]	;@ Rewrite offseted m6502pc
