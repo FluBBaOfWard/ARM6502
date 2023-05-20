@@ -1,7 +1,7 @@
 
 				;@ r0,r1,r2=temp regs
 	m6502nz		.req r3			;@ Bit 31=N, Z=1 if bits 0-7=0
-	m6502a		.req r4			;@ Bits  0-23=0, also used to clear bytes in memory (vdc.s)
+	m6502a		.req r4			;@ Bits  0-23=0
 	m6502x		.req r5			;@ Bits  0-23=0
 	m6502y		.req r6			;@ Bits  0-23=0
 	m6502sp		.req r7			;@ Bits 24-31=SP, bit 0=1.

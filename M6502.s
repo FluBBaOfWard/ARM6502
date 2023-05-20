@@ -59,8 +59,7 @@ _00:	;@ BRK				Error?
 	ldrb r0,[m6502pc]
 	cmp r0,#0					;@ Real BRK?
 	beq doBRK
-m6502Go:
-	fetch 0
+	b m6502Go
 ;@----------------------------------------------------------------------------
 _01:	;@ ORA ($nn,X)
 ;@----------------------------------------------------------------------------
@@ -1998,8 +1997,11 @@ m6502CheckIrqs:
 	ldrb r1,[m6502ptr,#m6502IrqPending]
 	and r0,cycles,#CYC_I		;@ CYC_I = 4
 	bics r0,r1,r0
-	beq m6502Go
+	bne takeIRQ
+m6502Go:
+	fetch 0
 ;@ - - - - - - - - - - - - - - - - - - -
+takeIRQ:
 	bic r1,r1,#0x18				;@ Clear Reset and NMI pending
 	strb r1,[m6502ptr,#m6502IrqPending]
 //whichIrq:
