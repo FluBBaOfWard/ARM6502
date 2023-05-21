@@ -24,6 +24,7 @@
 	.global m6502SetNMIPin
 	.global m6502SetIRQPin
 	.global m6502RestoreAndRunXCycles
+	.global m6502RunXCyclesC
 	.global m6502RunXCycles
 	.global m6502SaveState
 	.global m6502LoadState
@@ -339,10 +340,14 @@ _27:	;@ RLA $nn
 _28:	;@ PLP
 ;@----------------------------------------------------------------------------
 	pop8 r0
+	eor r2,cycles,r0
+	and r2,r2,cycles
 	decodePF
-;@	eatCycles 4
-;@	b m6502CheckIrqs			;@ Fixes?
-	fetch 4
+	eatCycles 4
+
+	tst r2,#CYC_I
+	bne forceIrqCheck
+	fetch 0
 ;@----------------------------------------------------------------------------
 _29:	;@ AND #$nn
 ;@----------------------------------------------------------------------------
@@ -518,8 +523,7 @@ _40:	;@ RTI
 	pop16						;@ Pop the return address
 	encodePC
 	eatCycles 6
-	b m6502CheckIrqs			;@ Fixes?
-;@	fetch 6
+	b m6502CheckIrqs			;@ RTI checks for interrupt immediately
 ;@----------------------------------------------------------------------------
 _41:	;@ EOR ($nn,X)
 ;@----------------------------------------------------------------------------
@@ -675,14 +679,16 @@ _57:	;@ SRE $nn,X
 ;@----------------------------------------------------------------------------
 _58:	;@ CLI
 ;@----------------------------------------------------------------------------
-	bic cycles,cycles,#CYC_I
-;@	eatCycles 2
-;@	b m6502CheckIrqs			;@ Fixes?
-
-	ldr r0,=cliFix				;@ Check IRQ lines after next instructions
-	str r0,[m6502ptr,#m6502NextTimeout]
 	eatCycles 2
-	str cycles,[m6502ptr,#m6502OldCycles]	;@ Save old cycles so we can use them later on.
+	ands r0,cycles,#CYC_I
+	beq m6502CheckIrqs
+	bic cycles,cycles,#CYC_I
+
+forceIrqCheck:
+	mov r0,cycles,asr#CYC_SHIFT	;@ Don't save any cpu bits.
+	ldr r1,=cliFix				;@ Check IRQ lines after next instructions
+	str r0,[m6502ptr,#m6502OldCycles]	;@ Save old cycles so we can use them later on.
+	str r1,[m6502ptr,#m6502NextTimeout]
 	clearCycles					;@ Clear cycles, save cpu bits
 
 	fetch 0
@@ -1961,12 +1967,11 @@ m6502SetIRQPin:
 	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
-cliFix:					;@ Cli should be delayed by 1 instruction.
+cliFix:					;@ CLI/PHP irq should be delayed by 1 instruction.
 ;@----------------------------------------------------------------------------
 	ldr r0,[m6502ptr,#m6502OldCycles]
 	adr r1,returnToCaller
 	str r1,[m6502ptr,#m6502NextTimeout]
-	mov r0,r0,asr#CYC_SHIFT		;@ Don't add any cpu bits.
 	b addR0Cycles
 ;@----------------------------------------------------------------------------
 m6502OutOfCycles:
@@ -2024,7 +2029,7 @@ irqContinue:
 	push8 r0
 
 	orr cycles,cycles,#CYC_I	;@ Disable IRQ
-#if !defined(CPU_RP2A03)
+#if defined(W65C02) || defined(W65C02_OLD)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
 	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
@@ -2155,12 +2160,13 @@ _FF:
 ;@----------------------------------------------------------------------------
 returnToC:
 	add r0,m6502ptr,#m6502Regs
-	stmia r0,{m6502nz-m6502pc,m6502zpage}	;@ Save M6502 state
+	stmia r0,{m6502nz-m6502pc}	;@ Save M6502 state
 	ldmfd sp!,{r4-r11,lr}
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502RunXCyclesC:	;@ r0 = number of cycles to run
+m6502RunXCyclesC:	;@ r0 = number of cycles to run, r1 = m6502ptr
 ;@----------------------------------------------------------------------------
+	mov m6502ptr,r1
 	stmfd sp!,{r4-r11,lr}
 	adr lr,returnToC
 	b m6502RunXCycles

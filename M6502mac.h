@@ -49,10 +49,10 @@
 
 	.macro decodePF			;@ Unpack M6502 flags from r0
 	bic cycles,cycles,#CYC_D+CYC_I+CYC_C+CYC_V
-	and r1,r0,#D+I+C+V
-	orr cycles,cycles,r1		;@ DICV
 	bic m6502nz,r0,#0xFD		;@ r0 is signed
 	eor m6502nz,m6502nz,#Z
+	and r0,r0,#D+I+C+V
+	orr cycles,cycles,r0		;@ DICV
 	.endm
 
 	.macro getNextOpcode
@@ -753,7 +753,6 @@
 	movs cycles,cycles,lsr#1		;@ Get C
 	orrcs r0,r0,#0x100
 	movs r0,r0,lsr#1
-	orr m6502nz,r0,r0,lsl#24		;@ NZ
 	adc cycles,cycles,cycles		;@ Set C
 	writeMem
 #ifndef CPU_RP2A03

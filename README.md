@@ -5,4 +5,4 @@ You can define W65C02, W65C02_OLD or CPU_RP2A03 to get different versions of the
 You can also define NO_FASTMEM_6502 to not use itcm (on NDS) or iwram (on GBA) for cpu core.
 
 First you need to allocate space for the cpu core state, either by using the struct from C or allocating/reserving memory using the "m6502Size"
-Next call m6502Init with a pointer to the memory.
+Next call m6502Init with a pointer to that memory.

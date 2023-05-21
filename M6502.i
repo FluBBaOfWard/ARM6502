@@ -25,6 +25,7 @@
 ;@----------------------------------------------------------------------------
 
 	.struct 0					;@ Changes section so make sure it is set before real code.
+m6502Start:
 m6502Opz:			.space 256*4
 m6502MemTbl:		.space 8*4
 m6502ReadTbl:		.space 8*4
@@ -51,7 +52,8 @@ m6502NextTimeout:	.long 0
 m6502BRKCount:		.long 0
 m6502BadOpCount:	.long 0
 #endif
-m6502Size:
+m6502End:
+m6502Size = m6502End-m6502Start
 m6502StateSize = m6502StateEnd-m6502StateStart
 
 ;@----------------------------------------------------------------------------
