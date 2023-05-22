@@ -26,6 +26,9 @@
 	.global m6502RestoreAndRunXCycles
 	.global m6502RunXCyclesC
 	.global m6502RunXCycles
+	.global m6502CheckIrqs
+	.global irq6502
+	.global translate6502PCToOffset
 	.global m6502SaveState
 	.global m6502LoadState
 	.global m6502GetStateSize
