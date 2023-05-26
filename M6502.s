@@ -2010,6 +2010,8 @@ takeIRQ:
 	clz r0,r0
 	rsb r0,r0,#0x1f
 #else
+	tst r0,#0x10				;@ Reset?
+	movne r0,#3
 	tst r0,#8					;@ NMI?
 	movne r0,#3
 	bne doNMI
@@ -2191,20 +2193,16 @@ m6502Reset:				;@ In r0=m6502ptr.
 	str r0,[m6502ptr,#m6502NextTimeout]
 
 ;@---cpu reset
+	mov m6502nz,#0
 	mov m6502a,#0
 	mov m6502x,#0
 	mov m6502y,#0
-	mov m6502nz,#0
-	ldr m6502sp,=0xFD000001		;@ 0x100-3
+	mov m6502sp,#1				;@ 0x100
 	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
 	mov cycles,#CYC_I			;@ V=0, D=0, C=0, I=1 disable IRQ.
 
-	str m6502a,[m6502ptr,#m6502IrqPending]	;@ Irq pending reset
-
-	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
-	ldr r1,=RES_VECTOR
-	ldrh m6502pc,[r0,r1]		;@ Get RESET vector
-	encodePC
+	mov r0,#0x10				;@ Reset pin
+	str r0,[m6502ptr,#m6502IrqPending]	;@ Irq pending reset
 
 	add r0,m6502ptr,#m6502Regs
 	stmia r0,{m6502nz-m6502pc,m6502zpage}
