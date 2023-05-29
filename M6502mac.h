@@ -58,25 +58,32 @@
 	.macro getNextOpcode
 	ldrb r0,[m6502pc],#1
 	.endm
+
+#ifdef CPU_RP2A03
+	.equ CYC_MULT, 3
+#else
+	.equ CYC_MULT, 1
+#endif
+
 #ifdef DEBUG
 	.macro executeOpcode count
-	subs cycles,cycles,#(\count)*CYCLE
+	subs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	b fetchDebug
 	.endm
 
 	.macro executeOpcode_c count
-	sbcs cycles,cycles,#(\count)*CYCLE
+	sbcs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	b fetchDebug
 	.endm
 #else
 	.macro executeOpcode count
-	subs cycles,cycles,#(\count)*CYCLE
+	subs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	ldrpl pc,[m6502ptr,r0,lsl#2]
 	b m6502OutOfCycles
 	.endm
 
 	.macro executeOpcode_c count
-	sbcs cycles,cycles,#(\count)*CYCLE
+	sbcs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	ldrpl pc,[m6502ptr,r0,lsl#2]
 	b m6502OutOfCycles
 	.endm
@@ -92,7 +99,7 @@
 	.endm
 
 	.macro eatCycles count
-	sub cycles,cycles,#(\count)*CYCLE
+	sub cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	.endm
 
 	.macro clearCycles
@@ -313,8 +320,10 @@
 	.macro doIIY			;@ Indirect indexed Y	($nn),Y
 	.set AddressMode, _ABS
 	ldrb r0,[m6502pc],#1
-	ldrb addy,[r0,m6502zpage]!
-	ldrb r1,[r0,#1]
+	mov r0,r0,lsl#24
+	ldrb addy,[m6502zpage,r0,lsr#24]
+	add r0,r0,#0x01000000
+	ldrb r1,[m6502zpage,r0,lsr#24]
 	add addy,addy,m6502y,lsr#24
 	add addy,addy,r1,lsl#8
 ;@	bic addy,addy,#0xff0000
@@ -517,7 +526,7 @@
 	.macro opBCC
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_C				;@ Test Carry
-	subeq cycles,cycles,#1*CYCLE
+	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -525,7 +534,7 @@
 	.macro opBCS
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_C				;@ Test Carry
-	subne cycles,cycles,#1*CYCLE
+	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -533,7 +542,7 @@
 	.macro opBEQ
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0xff
-	subeq cycles,cycles,#1*CYCLE
+	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -541,7 +550,7 @@
 	.macro opBMI
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0x80000000
-	subne cycles,cycles,#1*CYCLE
+	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -549,7 +558,7 @@
 	.macro opBNE
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0xff
-	subne cycles,cycles,#1*CYCLE
+	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -557,7 +566,7 @@
 	.macro opBPL
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0x80000000
-	subeq cycles,cycles,#1*CYCLE
+	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -565,7 +574,7 @@
 	.macro opBVC
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_V
-	subeq cycles,cycles,#1*CYCLE
+	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
 	fetch 2
 	.endm
@@ -573,7 +582,7 @@
 	.macro opBVS
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_V
-	subne cycles,cycles,#1*CYCLE
+	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
 	fetch 2
 	.endm
