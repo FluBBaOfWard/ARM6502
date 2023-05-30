@@ -2011,7 +2011,8 @@ takeIRQ:
 	rsb r0,r0,#0x1f
 #else
 	tst r0,#0x10				;@ Reset?
-	movne r0,#3
+	movne r0,#4
+	bne doNMI
 	tst r0,#8					;@ NMI?
 	movne r0,#3
 	bne doNMI
