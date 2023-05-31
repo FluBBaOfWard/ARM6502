@@ -702,7 +702,11 @@
 
 	.macro opLXA cyc
 	readMem
+#ifdef CPU_RP2A03
+	orr m6502a,m6502a,#0xFF000000
+#else
 	orr m6502a,m6502a,#0xEE000000
+#endif
 	and m6502a,m6502a,r0,lsl#24
 	mov m6502x,m6502a
 	getNextOpcode
