@@ -33,9 +33,7 @@
 	.endm
 
 	.macro reEncodePC			;@ Retranslate m6502pc romoffset
-	loadLastBank r0
-	sub m6502pc,m6502pc,r0
-	encodePC
+	bl reTranslate6502PCToOffset
 	.endm
 
 	.macro encodeP extra	;@ Pack M6502 flags into r0
@@ -44,7 +42,7 @@
 	orrne r0,r0,#N				;@ N
 	tst m6502nz,#0xff
 	orreq r0,r0,#Z				;@ Z
-	orr r0,r0,#\extra			;@ B...
+	orr r0,r0,#\extra			;@ R (& B)
 	.endm
 
 	.macro decodePF			;@ Unpack M6502 flags from r0

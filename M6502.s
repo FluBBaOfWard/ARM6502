@@ -601,7 +601,6 @@ _4C:	;@ JMP $nnnn
 	ldrb m6502pc,[m6502pc,#1]
 	add r2,m6502ptr,#m6502MemTbl
 	and r1,m6502pc,#0xE0
-//	encodePC
 	ldr r1,[r2,r1,lsr#3]		;@ In: m6502pc.
 	orr m6502pc,r0,m6502pc,lsl#8
 	add m6502pc,m6502pc,r1
@@ -2003,21 +2002,19 @@ m6502Go:
 	fetch 0
 ;@ - - - - - - - - - - - - - - - - - - -
 takeIRQ:
-	bic r1,r1,#0x18				;@ Clear Reset and NMI pending
+	and r1,r1,#0x04				;@ Clear Reset and NMI pending
 	strb r1,[m6502ptr,#m6502IrqPending]
 //whichIrq:
 #ifdef ARM9
 	clz r0,r0
 	rsb r0,r0,#0x1f
 #else
-	tst r0,#0x10				;@ Reset?
-	movne r0,#4
-	bne doNMI
-	tst r0,#8					;@ NMI?
-	movne r0,#3
-	bne doNMI
-	tst r0,#4					;@ IRQ
-	movne r0,#2
+	movs r0,r0,lsl#28
+	movcs r0,#4					;@ Reset?
+	bcs doNMI
+	movmi r0,#3					;@ NMI?
+	bmi doNMI
+	mov r0,#2					;@ IRQ
 doNMI:
 #endif // ARM9
 	adr r2,interruptVectors
