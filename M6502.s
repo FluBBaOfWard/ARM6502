@@ -31,6 +31,8 @@
 	.global m6502SaveState
 	.global m6502LoadState
 	.global m6502GetStateSize
+	.global m6502PatchOpcode
+	.global m6502RestoreOpcode
 	.global m6502OutOfCycles
 	.global memRead8
 	.global memWrite8
@@ -976,7 +978,7 @@ _80:	;@ BRA branch always
 ;@----------------------------------------------------------------------------
 	ldrsb r0,[m6502pc],#1
 	add m6502pc,m6502pc,r0
-	fetch 3							;@ +1 if pageboundary crossed?
+	fetch 3							;@ +1 if pageboundary crossed.
 #endif
 
 ;@----------------------------------------------------------------------------
@@ -2251,6 +2253,20 @@ m6502GetStateSize:		;@ Out r0=state size.
 	.type   m6502GetStateSize STT_FUNC
 ;@----------------------------------------------------------------------------
 	mov r0,#m6502StateSize				;@ Right now 0x24
+	bx lr
+;@----------------------------------------------------------------------------
+m6502PatchOpcode:		;@ In r0=m6502ptr, r1=opcode, r2=address.
+	.type   m6502PatchOpcode STT_FUNC
+;@----------------------------------------------------------------------------
+	str r2,[r0,r1,lsl#2]
+	bx lr
+;@----------------------------------------------------------------------------
+m6502RestoreOpcode:		;@ In r0=m6502ptr, r1=opcode
+	.type   m6502PatchOpcode STT_FUNC
+;@----------------------------------------------------------------------------
+	adr r3,m6502OpTable
+	ldr r2,[r3,r1,lsl#2]
+	str r2,[r0,r1,lsl#2]
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502OpTable:

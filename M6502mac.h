@@ -340,16 +340,18 @@
 	ldrb addy,[m6502pc],#1
 	.endm
 
+#if defined(W65C02)
 	.macro doZ2				;@ Zero page			$nn
 	.set AddressMode, _ZP
 	ldrb addy,[m6502pc],#2		;@ Ugly thing for BBR/BBS
 	.endm
+#endif
 
 	.macro doZIX			;@ Zero page indexed X	$nn,X
 	.set AddressMode, _ZP
 	ldrb addy,[m6502pc],#1
-	add addy,addy,m6502x,lsr#24
-	and addy,addy,#0xff
+	add addy,m6502x,addy,lsl#24
+	mov addy,addy,lsr#24
 	.endm
 
 	.macro doZIXf			;@ Zero page indexed X	$nn,X
@@ -361,8 +363,8 @@
 	.macro doZIY			;@ Zero page indexed Y	$nn,Y
 	.set AddressMode, _ZP
 	ldrb addy,[m6502pc],#1
-	add addy,addy,m6502y,lsr#24
-	and addy,addy,#0xff
+	add addy,m6502y,addy,lsl#24
+	mov addy,addy,lsr#24
 	.endm
 
 	.macro doZIYf			;@ Zero page indexed Y	$nn,Y
@@ -467,6 +469,7 @@
 	fetch \cyc
 	.endm
 
+#if defined(W65C02)
 	.macro opBBR bit
 	doZ2
 	readMemZP
@@ -510,6 +513,7 @@
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
 	fetch 6
 	.endm
+#endif
 
 	.macro opBIT cyc
 	bic cycles,cycles,#CYC_V		;@ Clear V
@@ -665,6 +669,14 @@
 
 	.macro opLOAD reg cyc
 	readMemS
+	getNextOpcode
+	mov \reg,m6502nz,lsl#24
+	executeOpcode \cyc
+	.endm
+
+	.macro opLoadAbsX reg cyc
+	readMemAIX
+	orr m6502nz,r0,r0,lsl#24
 	getNextOpcode
 	mov \reg,m6502nz,lsl#24
 	executeOpcode \cyc

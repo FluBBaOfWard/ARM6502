@@ -7,10 +7,11 @@ extern "C" {
 
 typedef struct {
 	void *opz[256];
+	u32 *memTbl[8];
 	void *readTbl[8];
 	void *writeTbl[8];
-	u32 *memTbl[8];
 
+// StateStart
 	u32 regNz;
 	u32 regA;
 	u32 regX;
@@ -57,6 +58,21 @@ int m6502LoadState(M6502Core *cpu, const void *source);
  * @return The size of the state.
  */
 int m6502GetStateSize(void);
+
+/**
+ * Patch an opcode to a new function.
+ * @param  *cpu: The M6502Core cpu to patch.
+ * @param  opcode: Which opcode to redirect.
+ * @param  *function: Pointer to new function .
+ */
+void m6502PatchOpcode(M6502Core *cpu, int opcode, void *function);
+
+/**
+ * Restore a previously patched opcode.
+ * @param  *cpu: The M6502Core cpu to patch.
+ * @param  opcode: Which opcode to restore.
+ */
+void m6502RestoreOpcode(M6502Core *cpu, int opcode);
 
 void m6502RunXCyclesC(int cycles, M6502Core *cpu);
 
