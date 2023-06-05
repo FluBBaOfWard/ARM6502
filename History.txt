@@ -2,11 +2,13 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
-V0.2.2 - 2023-06-04 (FluBBa)
+V0.3.0 - 2023-06-05 (FluBBa)
 	Removed allocated cpu core, added init function.
 	Fixed PHP, PLP, BRK & JMP(nnnn).
 	Optimzed zero page indirect opcodes.
 	Optimized IRQ check a tiny bit.
+	Added patch opcode function.
+	Added support for 6510.
 
 V0.2.1 - 2022-09-20 (FluBBa)
 	Fixed better calling conventions.

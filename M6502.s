@@ -2,22 +2,6 @@
 
 #include "M6502mac.h"
 
-	.syntax unified
-	.arm
-
-#if defined(NDS) && !defined(NO_FASTMEM_6502)
-	.section .itcm						;@ For the NDS ARM9
-#elif defined(GBA)
-	#if !defined(NO_FASTMEM_6502)
-	.section .iwram, "ax", %progbits	;@ For the GBA
-	#else
-	.section .ewram, "ax"				;@ For the GBA
-	#endif
-#else
-	.section .text
-#endif
-	.align 2
-
 	.global m6502Init
 	.global m6502Reset
 	.global m6502SetResetPin
@@ -36,6 +20,22 @@
 	.global m6502OutOfCycles
 	.global memRead8
 	.global memWrite8
+
+	.syntax unified
+	.arm
+
+#if defined(NDS) && !defined(NO_FASTMEM_6502)
+	.section .itcm						;@ For the NDS ARM9
+	#elif defined(GBA)
+	#if !defined(NO_FASTMEM_6502)
+	.section .iwram, "ax", %progbits	;@ For the GBA
+	#else
+	.section .ewram, "ax"				;@ For the GBA
+	#endif
+#else
+	.section .text
+#endif
+	.align 2
 
 #ifdef DEBUG
 fetchDebug:

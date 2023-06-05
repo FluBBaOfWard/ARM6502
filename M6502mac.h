@@ -140,6 +140,15 @@
 	bl memRead8ZInd
 	.endm
 
+#if defined(CPU_6510)
+	.macro readMemZP
+	bl ram_R
+	.endm
+
+	.macro readMemZPI
+	bl ram_low_R
+	.endm
+#else
 	.macro readMemZP
 	ldrb r0,[m6502zpage,addy]
 	.endm
@@ -147,6 +156,7 @@
 	.macro readMemZPI
 	ldrb r0,[m6502zpage,addy,lsr#24]
 	.endm
+#endif
 
 	.macro readMemZPS
 	ldrsb m6502nz,[m6502zpage,addy]
@@ -202,6 +212,15 @@
 	bl memWrite8
 	.endm
 
+#if defined(CPU_6510)
+	.macro writeMemZP
+	bl ram_W
+	.endm
+
+	.macro writeMemZPI
+	bl ram_low_W
+	.endm
+#else
 	.macro writeMemZP
 	strb r0,[m6502zpage,addy]
 	.endm
@@ -209,6 +228,7 @@
 	.macro writeMemZPI
 	strb r0,[m6502zpage,addy,lsr#24]
 	.endm
+#endif
 
 	.macro writeMem
 	.ifeq AddressMode-_ABS
