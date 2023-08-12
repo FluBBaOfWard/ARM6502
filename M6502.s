@@ -2162,18 +2162,18 @@ _FF:
 	fetch 1
 #endif
 ;@----------------------------------------------------------------------------
+m6502RunXCyclesC:	;@ r0 = number of cycles to run, r1 = m6502ptr
+	.type m6502RunXCyclesC STT_FUNC
+;@----------------------------------------------------------------------------
+	mov m6502ptr,r1
+	stmfd sp!,{r4-r11,lr}
+	bl m6502RestoreAndRunXCycles
+;@----------------------------------------------------------------------------
 returnToC:
 	add r0,m6502ptr,#m6502Regs
 	stmia r0,{m6502nz-m6502pc}	;@ Save M6502 state
 	ldmfd sp!,{r4-r11,lr}
 	bx lr
-;@----------------------------------------------------------------------------
-m6502RunXCyclesC:	;@ r0 = number of cycles to run, r1 = m6502ptr
-;@----------------------------------------------------------------------------
-	mov m6502ptr,r1
-	stmfd sp!,{r4-r11,lr}
-	adr lr,returnToC
-	b m6502RunXCycles
 ;@----------------------------------------------------------------------------
 m6502Init:				;@ In r0=m6502ptr.
 	.type m6502Init STT_FUNC
