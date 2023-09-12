@@ -350,7 +350,7 @@ _28:	;@ PLP
 	eatCycles 4
 
 	tst r2,#CYC_I
-	bne forceIrqCheck
+	bne m6502DelayIrqCheck
 	fetch 0
 ;@----------------------------------------------------------------------------
 _29:	;@ AND #$nn
@@ -683,17 +683,10 @@ _57:	;@ SRE $nn,X
 _58:	;@ CLI
 ;@----------------------------------------------------------------------------
 	eatCycles 2
-	ands r0,cycles,#CYC_I
-	beq m6502CheckIrqs
+	tst cycles,#CYC_I
+//	beq m6502CheckIrqs
 	bic cycles,cycles,#CYC_I
-
-forceIrqCheck:
-	mov r0,cycles,asr#CYC_SHIFT	;@ Don't save any cpu bits.
-	ldr r1,=cliFix				;@ Check IRQ lines after next instructions
-	str r0,[m6502ptr,#m6502OldCycles]	;@ Save old cycles so we can use them later on.
-	str r1,[m6502ptr,#m6502NextTimeout]
-	clearCycles					;@ Clear cycles, save cpu bits
-
+	bne m6502DelayIrqCheck
 	fetch 0
 	.pool
 ;@----------------------------------------------------------------------------
@@ -1970,17 +1963,16 @@ m6502SetIRQPin:
 	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
-cliFix:					;@ CLI/PHP irq should be delayed by 1 instruction.
+m6502DelayIrqCheck:				;@ Irq should be delayed by 1 instruction.
 ;@----------------------------------------------------------------------------
-	ldr r0,[m6502ptr,#m6502OldCycles]
-	adr r1,returnToCaller
-	str r1,[m6502ptr,#m6502NextTimeout]
-	b addR0Cycles
+	orr cycles,cycles,#0xC0000000
+	executeNext
 ;@----------------------------------------------------------------------------
 m6502OutOfCycles:
 	sub m6502pc,m6502pc,#1
-	ldr pc,[m6502ptr,#m6502NextTimeout]
-returnToCaller:
+	mov cycles,cycles,lsl#2		;@ Check for delayed irq check.
+	movs cycles,cycles,asr#2
+	bpl m6502CheckIrqs
 	ldmfd sp!,{lr}
 	bx lr
 ;@----------------------------------------------------------------------------
@@ -2188,9 +2180,6 @@ m6502Reset:				;@ In r0=m6502ptr.
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4-r11,lr}
 	mov m6502ptr,r0
-
-	ldr r0,=returnToCaller
-	str r0,[m6502ptr,#m6502NextTimeout]
 
 ;@---cpu reset
 	mov m6502nz,#0

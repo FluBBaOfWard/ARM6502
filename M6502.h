@@ -25,8 +25,7 @@ typedef struct {
 	u8 padding[2];
 
 	void *lastBank;
-	int oldCycles;
-	void *nextTimeout;
+	int alignment[2];
 #ifdef DEBUG
 	u32 brkCount;
 	u32 badOpCount;

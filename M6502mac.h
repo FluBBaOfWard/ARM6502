@@ -73,6 +73,11 @@
 	sbcs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	b fetchDebug
 	.endm
+
+	.macro executeNext
+	getNextOpcode
+	b fetchDebug
+	.endm
 #else
 	.macro executeOpcode count
 	subs cycles,cycles,#(\count)*CYC_MULT*CYCLE
@@ -84,6 +89,11 @@
 	sbcs cycles,cycles,#(\count)*CYC_MULT*CYCLE
 	ldrpl pc,[m6502ptr,r0,lsl#2]
 	b m6502OutOfCycles
+	.endm
+
+	.macro executeNext
+	getNextOpcode
+	ldr pc,[m6502ptr,r0,lsl#2]
 	.endm
 #endif
 	.macro fetch count

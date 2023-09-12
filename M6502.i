@@ -46,8 +46,7 @@ m6502Padding:		.space 2
 m6502StateEnd:
 
 m6502LastBank:		.long 0
-m6502OldCycles:		.long 0
-m6502NextTimeout:	.long 0
+m6502Alignment:		.space 4 * 2
 #ifdef DEBUG
 m6502BRKCount:		.long 0
 m6502BadOpCount:	.long 0
