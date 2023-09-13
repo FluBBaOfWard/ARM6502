@@ -46,10 +46,11 @@ m6502Padding:		.space 2
 m6502StateEnd:
 
 m6502LastBank:		.long 0
-m6502Alignment:		.space 4 * 2
 #ifdef DEBUG
 m6502BRKCount:		.long 0
 m6502BadOpCount:	.long 0
+#else
+m6502Alignment:		.space 4 * 2
 #endif
 m6502End:
 m6502Size = m6502End-m6502Start

@@ -1,4 +1,4 @@
-# ARM6502 V0.3.0
+# ARM6502 V0.3.1
 A 6502 cpu emulator for ARM32.
 
 You can define W65C02, W65C02_OLD, CPU_6510 or CPU_RP2A03 to get different versions of the 6502.

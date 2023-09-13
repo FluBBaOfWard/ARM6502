@@ -25,10 +25,11 @@ typedef struct {
 	u8 padding[2];
 
 	void *lastBank;
-	int alignment[2];
 #ifdef DEBUG
 	u32 brkCount;
 	u32 badOpCount;
+#else
+	int alignment[2];
 #endif
 } M6502Core;
 

@@ -2,8 +2,9 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
-V0.3.1 - 2023-08-12 (FluBBa)
+V0.3.1 - 2023-09-13 (FluBBa)
 	Fixed m6502RunXCyclesC function.
+	Optimized delayed IRQ check.
 
 V0.3.0 - 2023-06-05 (FluBBa)
 	Removed allocated cpu core, added init function.
