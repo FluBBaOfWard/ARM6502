@@ -50,7 +50,7 @@ m6502LastBank:		.long 0
 m6502BRKCount:		.long 0
 m6502BadOpCount:	.long 0
 #else
-m6502Alignment:		.space 4 * 2
+m6502Alignment:		.space 2*4
 #endif
 m6502End:
 m6502Size = m6502End-m6502Start
