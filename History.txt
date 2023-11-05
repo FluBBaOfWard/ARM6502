@@ -2,7 +2,7 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
-V0.3.1 - 2023-1105 (FluBBa)
+V0.3.1 - 2023-11-05 (FluBBa)
 	Fixed m6502RunXCyclesC function.
 	Optimized delayed IRQ check.
 

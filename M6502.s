@@ -2245,7 +2245,7 @@ m6502GetStateSize:		;@ Out r0=state size.
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502RestoreOpcode:		;@ In r0=m6502ptr, r1=opcode
-	.type   m6502PatchOpcode STT_FUNC
+	.type   m6502RestoreOpcode STT_FUNC
 ;@----------------------------------------------------------------------------
 	adr r3,m6502OpTable
 	ldr r2,[r3,r1,lsl#2]
