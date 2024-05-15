@@ -6,10 +6,10 @@ extern "C" {
 #endif
 
 typedef struct {
-	void *opz[256];
-	u32 *memTbl[8];
-	void *readTbl[8];
-	void *writeTbl[8];
+	void (*opz[256])(void);
+	u8 *memTbl[8];
+	u8 (*readTbl[8])();
+	void (*writeTbl[8])();
 
 // StateStart
 	u32 regNz;
@@ -18,13 +18,13 @@ typedef struct {
 	u32 regY;
 	u32 regSp;
 	u32 cycles;
-	u32 regPc;
+	u8 *regPc;
 	u32 zeroPage;
 	u8 irqPending;
 	u8 nmiPin;
 	u8 padding[2];
 
-	void *lastBank;
+	u8 *lastBank;
 #ifdef DEBUG
 	u32 brkCount;
 	u32 badOpCount;
@@ -65,7 +65,7 @@ int m6502GetStateSize(void);
  * @param  opcode: Which opcode to redirect.
  * @param  *function: Pointer to new function .
  */
-void m6502PatchOpcode(M6502Core *cpu, int opcode, void *function);
+void m6502PatchOpcode(M6502Core *cpu, int opcode, void (*function)(void));
 
 /**
  * Restore a previously patched opcode.
