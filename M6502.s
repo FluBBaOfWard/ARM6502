@@ -1938,14 +1938,14 @@ translate6502PCToOffset:	;@ In = m6502pc, out = r0 bank offset
 m6502SetResetPin:			;@ Can only be set
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502ptr,#m6502IrqPending]
-	orr r0,r0,#0x10
+	orr r0,r0,#RESET_F
 	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
-	movne r0,#8
+	movne r0,#NMI_F
 	ldrb r1,[m6502ptr,#m6502NMIPin]
 	strb r0,[m6502ptr,#m6502NMIPin]
 	bics r1,r0,r1
@@ -1958,8 +1958,8 @@ m6502SetIRQPin:
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
 	ldrb r0,[m6502ptr,#m6502IrqPending]
-	biceq r0,r0,#0x04
-	orrne r0,r0,#0x04
+	biceq r0,r0,#IRQ_F
+	orrne r0,r0,#IRQ_F
 	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
@@ -1989,14 +1989,14 @@ addR0Cycles:
 ;@----------------------------------------------------------------------------
 m6502CheckIrqs:
 	ldrb r1,[m6502ptr,#m6502IrqPending]
-	and r0,cycles,#CYC_I		;@ CYC_I = 4
+	and r0,cycles,#CYC_I		;@ CYC_I = IRQ_F = 4
 	bics r0,r1,r0
 	bne takeIRQ
 m6502Go:
 	fetch 0
 ;@ - - - - - - - - - - - - - - - - - - -
 takeIRQ:
-	and r1,r1,#0x04				;@ Clear Reset and NMI pending
+	and r1,r1,#IRQ_F			;@ Clear Reset and NMI pending
 	strb r1,[m6502ptr,#m6502IrqPending]
 //whichIrq:
 #ifdef ARM9
@@ -2190,7 +2190,7 @@ m6502Reset:				;@ In r0=m6502ptr.
 	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
 	mov cycles,#CYC_I			;@ V=0, D=0, C=0, I=1 disable IRQ.
 
-	mov r0,#0x10				;@ Reset pin
+	mov r0,#RESET_F				;@ Reset pin
 	str r0,[m6502ptr,#m6502IrqPending]	;@ Irq pending reset
 
 	add r0,m6502ptr,#m6502Regs

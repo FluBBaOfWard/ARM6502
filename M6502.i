@@ -17,11 +17,15 @@
 	.equ CYC_MASK, CYCLE-1		;@ Mask
 ;@----------------------------------------------------------------------------
 ;@ cycle flags- (stored in cycles reg for speed)
-
 	.equ CYC_C, 0x01			;@ Carry bit
 	.equ CYC_I, 0x04			;@ IRQ mask
 	.equ CYC_D, 0x08			;@ Decimal bit
 	.equ CYC_V, 0x40			;@ Overflow bit
+;@----------------------------------------------------------------------------
+;@ IRQ flags
+	.equ IRQ_F,   0x04			;@ IRQ flag
+	.equ NMI_F,   0x08			;@ NMI flag
+	.equ RESET_F, 0x10			;@ Reset flag
 ;@----------------------------------------------------------------------------
 
 	.struct 0					;@ Changes section so make sure it is set before real code.
