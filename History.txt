@@ -2,6 +2,9 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
+V0.3.5 - 2024-07-27 (FluBBa)
+	Fixed page crossing taking extra cycles.
+
 V0.3.1 - 2023-11-05 (FluBBa)
 	Fixed m6502RunXCyclesC function.
 	Optimized delayed IRQ check.

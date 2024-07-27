@@ -33,6 +33,10 @@ typedef struct {
 #endif
 } M6502Core;
 
+/**
+ * Initializes the opcode table.
+ * @param  *cpu: The M6502Core cpu to initialize.
+ */
 void m6502Init(M6502Core *cpu);
 
 void m6502Reset(M6502Core *cpu);

@@ -564,64 +564,88 @@
 	.macro opBCC
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_C				;@ Test Carry
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBCS
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_C				;@ Test Carry
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBEQ
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0xff
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBMI
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0x80000000
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBNE
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0xff
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBPL
 	ldrsb r0,[m6502pc],#1
 	tst m6502nz,#0x80000000
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBVC
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_V
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subeq cycles,cycles,#CYC_MULT*CYCLE
 	addeq m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
 	.macro opBVS
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_V
+	mov r1,m6502pc,lsl#23			;@ Prepare check of page crossing
 	subne cycles,cycles,#CYC_MULT*CYCLE
 	addne m6502pc,m6502pc,r0
+	eors r1,r1,m6502pc,lsl#23		;@ Check page crossing
+	submi cycles,cycles,#CYC_MULT*CYCLE
 	fetch 2
 	.endm
 
