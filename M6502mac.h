@@ -324,12 +324,30 @@
 ;@	bic addy,addy,#0xff0000
 	.endm
 
+	.macro doAIX_W			;@ Absolute indexed X	$nnnn,X; Write
+	.set AddressMode, _ABS
+	ldrb addy,[m6502pc],#1
+	ldrb r0,[m6502pc],#1
+	add addy,addy,m6502x,lsr#24
+	add addy,addy,r0,lsl#8
+;@	bic addy,addy,#0xff0000
+	.endm
+
 	.macro doAIY			;@ Absolute indexed Y	$nnnn,Y
 	.set AddressMode, _ABS
 	ldrb addy,[m6502pc],#1
 	ldrb r0,[m6502pc],#1
 	cmn m6502y,addy,lsl#24
 	subcs cycles,cycles,#CYC_MULT*CYCLE	;@ Waste a cycle if address crosses a page
+	add addy,addy,m6502y,lsr#24
+	add addy,addy,r0,lsl#8
+;@	bic addy,addy,#0xff0000
+	.endm
+
+	.macro doAIY_W			;@ Absolute indexed Y	$nnnn,Y; Write
+	.set AddressMode, _ABS
+	ldrb addy,[m6502pc],#1
+	ldrb r0,[m6502pc],#1
 	add addy,addy,m6502y,lsr#24
 	add addy,addy,r0,lsl#8
 ;@	bic addy,addy,#0xff0000
@@ -358,6 +376,18 @@
 	ldrb r1,[m6502zpage,r0,lsr#24]
 	cmn m6502y,addy,lsl#24
 	subcs cycles,cycles,#CYC_MULT*CYCLE	;@ Waste a cycle if address crosses a page
+	add addy,addy,m6502y,lsr#24
+	add addy,addy,r1,lsl#8
+;@	bic addy,addy,#0xff0000
+	.endm
+
+	.macro doIIY_W			;@ Indirect indexed Y	($nn),Y; Write
+	.set AddressMode, _ABS
+	ldrb r0,[m6502pc],#1
+	mov r0,r0,lsl#24
+	ldrb addy,[m6502zpage,r0,lsr#24]
+	add r0,r0,#0x01000000
+	ldrb r1,[m6502zpage,r0,lsr#24]
 	add addy,addy,m6502y,lsr#24
 	add addy,addy,r1,lsl#8
 ;@	bic addy,addy,#0xff0000
