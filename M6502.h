@@ -9,7 +9,7 @@ typedef struct {
 	void (*opz[256])(void);
 	u8 *memTbl[8];
 	u8 (*readTbl[8])();
-	void (*writeTbl[8])();
+	void (*writeTbl[8])(u8 val);
 
 // StateStart
 	u32 regNz;

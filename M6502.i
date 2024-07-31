@@ -1,4 +1,8 @@
 
+#if !__ASSEMBLER__
+	#error This header file is only for use in assembly files!
+#endif
+
 				;@ r0,r1,r2=temp regs
 	m6502nz		.req r3			;@ Bit 31=N, Z=1 if bits 0-7=0
 	m6502a		.req r4			;@ Bits  0-23=0
