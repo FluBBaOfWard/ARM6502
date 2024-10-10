@@ -2021,17 +2021,14 @@ takeIRQ:
 #ifdef ARM9
 	clz r0,r0
 	rsb r0,r0,#0x1f
-#else
-	movs r0,r0,lsl#28
-	movcs r0,#4					;@ Reset?
-	bcs doNMI
-	movmi r0,#3					;@ NMI?
-	bmi doNMI
-	mov r0,#2					;@ IRQ
-doNMI:
-#endif // ARM9
 	adr r2,interruptVectors
 	ldr r12,[r2,r0,lsl#2]
+#else
+	movs r0,r0,lsl#28
+	ldrpl r12,interruptVectors+8	;@ IRQ
+	ldrmi r12,interruptVectors+12	;@ NMI?
+	ldrcs r12,interruptVectors+16	;@ Reset?
+#endif // ARM9
 ;@----------------------------------------------------------
 irq6502:					;@ Needs irq vector in r12
 ;@----------------------------------------------------------
