@@ -579,6 +579,14 @@
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
 	fetch 6
 	.endm
+
+	.macro opBITimm
+	and r0,r0,m6502a,lsr#24			;@ Z
+	and m6502nz,m6502nz,0x80000000	;@ Kepp old N
+	orr m6502nz,m6502nz,r0			;@ Z
+	getNextOpcode
+	executeOpcode 2
+	.endm
 #endif
 
 	.macro opBIT cyc
