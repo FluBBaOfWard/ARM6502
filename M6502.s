@@ -26,7 +26,7 @@
 
 #if defined(NDS) && !defined(NO_FASTMEM_6502)
 	.section .itcm						;@ For the NDS ARM9
-	#elif defined(GBA)
+#elif defined(GBA)
 	#if !defined(NO_FASTMEM_6502)
 	.section .iwram, "ax", %progbits	;@ For the GBA
 	#else
@@ -601,14 +601,9 @@ _4C:	;@ JMP $nnnn
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502pc]
 	ldrb m6502pc,[m6502pc,#1]
-	add r2,m6502ptr,#m6502MemTbl
-	and r1,m6502pc,#0xE0
-	ldr r1,[r2,r1,lsr#3]		;@ In: m6502pc.
 	orr m6502pc,r0,m6502pc,lsl#8
-	add m6502pc,m6502pc,r1
-	getNextOpcode
-	storeLastBank r1
-	executeOpcode 3
+	encodePC
+	fetch 3
 ;@----------------------------------------------------------------------------
 _4D:	;@ EOR $nnnn
 ;@----------------------------------------------------------------------------
@@ -829,7 +824,7 @@ _6C:	;@ JMP ($nnnn)
 	readMemABS
 	mov m6502pc,r0
 	mov addy,addy,lsl#16
-	add addy,addy,#0x00010000	;@ Update whole adress
+	add addy,addy,#0x00010000	;@ Update whole address
 	mov addy,addy,lsr#16
 	readMem8
 	orr m6502pc,m6502pc,r0,lsl#8
@@ -946,12 +941,9 @@ _7B:	;@ RRA $nnnn,Y
 _7C:	;@ JMP ($nnnn,X)
 ;@----------------------------------------------------------------------------
 	doAIX
-	add r1,m6502ptr,m6502MemTbl
-	and r2,addy,#0xE000
-	ldr r1,[r1,r2,lsr#11]
-	ldrb m6502pc,[r1,addy]!
-	ldrb r0,[r1,#1]
-	orr m6502pc,m6502pc,r0,lsl#8
+	readMem8
+	ldrb m6502pc,[r1,#1]
+	orr m6502pc,r0,m6502pc,lsl#8
 	encodePC
 	fetch 6
 #endif
@@ -1946,9 +1938,17 @@ reTranslate6502PCToOffset:		;@ In = m6502pc+bank, out = r0 bank offset
 ;@----------------------------------------------------------------------------
 translate6502PCToOffset:	;@ In = m6502pc, out = r0 bank offset
 ;@----------------------------------------------------------------------------
-	add r1,m6502ptr,#m6502MemTbl
-	and r0,m6502pc,#0xE000
-	ldr r0,[r1,r0,lsr#11]
+//	add r1,m6502ptr,#m6502MemTbl
+//	and r0,m6502pc,#0xE000
+//	ldr r0,[r1,r0,lsr#11]
+	stmfd sp!,{lr}
+	mov addy,m6502pc
+	add r0,m6502ptr,#m6502ReadTbl
+	and r1,addy,#0xE000
+	mov lr,pc
+	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
+	ldmfd sp!,{lr}
+	sub r0,r1,addy
 	storeLastBank r0
 	add m6502pc,m6502pc,r0
 	bx lr						;@ Out: m6502pc.
@@ -1992,6 +1992,7 @@ m6502OutOfCycles:
 	mov cycles,cycles,lsl#2		;@ Check for delayed irq check.
 	movs cycles,cycles,asr#2
 	bpl m6502CheckIrqs
+//	reEncodePC
 	ldmfd sp!,{lr}
 	bx lr
 ;@----------------------------------------------------------------------------
@@ -2044,8 +2045,12 @@ irqContinue:
 #if defined(W65C02) || defined(W65C02_OLD)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
-	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
-	ldrh m6502pc,[r0,r12]
+//	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
+//	ldrh m6502pc,[r0,r12]
+	mov lr,pc
+	ldr pc,[m6502ptr,#m6502ReadTbl+7*4]
+	ldrb m6502pc,[r1,#1]		;@ Next byte
+	orr m6502pc,r0,m6502pc,lsl#8
 	encodePC					;@ Get IRQ vector
 
 	fetch 7
