@@ -1,1 +1,1 @@
-#define ARM6502VERSION "V0.3.5"
+#define ARM6502VERSION "V0.3.6"

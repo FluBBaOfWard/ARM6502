@@ -2219,10 +2219,10 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4,m6502ptr,lr}
 
-	sub r4,r0,#m6502Regs
+	sub r4,r0,#m6502StateStart
 	mov m6502ptr,r1
 
-	add r1,m6502ptr,#m6502Regs
+	add r1,m6502ptr,#m6502StateStart
 	mov r2,#m6502StateSize					;@ Right now 0x24
 	bl memcpy
 
@@ -2239,20 +2239,20 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 	.type   m6502LoadState STT_FUNC
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{m6502pc,m6502ptr,lr}
+	stmfd sp!,{m6502pc,m6502ptr,m6502zpage,lr}
 
 	mov m6502ptr,r0
-	add r0,m6502ptr,#m6502Regs
+	add r0,m6502ptr,#m6502StateStart
 	mov r2,#m6502StateSize	;@ Right now 0x24
 	bl memcpy
 
-	ldr r0,[m6502ptr,#m6502MemTbl]
-	str r0,[m6502ptr,#m6502ZeroPage]
+	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
+	str m6502zpage,[m6502ptr,#m6502ZeroPage]
 	ldr m6502pc,[m6502ptr,#m6502RegPC]	;@ Normal m6502pc
 	encodePC
 	str m6502pc,[m6502ptr,#m6502RegPC]	;@ Rewrite offseted m6502pc
 
-	ldmfd sp!,{m6502pc,m6502ptr,lr}
+	ldmfd sp!,{m6502pc,m6502ptr,m6502zpage,lr}
 ;@----------------------------------------------------------------------------
 m6502GetStateSize:		;@ Out r0=state size.
 	.type   m6502GetStateSize STT_FUNC
