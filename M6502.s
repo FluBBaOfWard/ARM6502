@@ -26,7 +26,7 @@
 
 #if defined(NDS) && !defined(NO_FASTMEM_6502)
 	.section .itcm						;@ For the NDS ARM9
-	#elif defined(GBA)
+#elif defined(GBA)
 	#if !defined(NO_FASTMEM_6502)
 	.section .iwram, "ax", %progbits	;@ For the GBA
 	#else
@@ -829,7 +829,7 @@ _6C:	;@ JMP ($nnnn)
 	readMemABS
 	mov m6502pc,r0
 	mov addy,addy,lsl#16
-	add addy,addy,#0x00010000	;@ Update whole adress
+	add addy,addy,#0x00010000	;@ Update whole address
 	mov addy,addy,lsr#16
 	readMem8
 	orr m6502pc,m6502pc,r0,lsl#8
@@ -949,9 +949,9 @@ _7C:	;@ JMP ($nnnn,X)
 	add r1,m6502ptr,m6502MemTbl
 	and r2,addy,#0xE000
 	ldr r1,[r1,r2,lsr#11]
-	ldrb m6502pc,[r1,addy]!
-	ldrb r0,[r1,#1]
-	orr m6502pc,m6502pc,r0,lsl#8
+	ldrb r0,[r1,addy]!
+	ldrb m6502pc,[r1,#1]
+	orr m6502pc,r0,m6502pc,lsl#8
 	encodePC
 	fetch 6
 #endif

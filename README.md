@@ -1,4 +1,4 @@
-# ARM6502 V0.3.5
+# ARM6502 V0.3.7
 
 A 6502 cpu emulator for ARM32.
 
@@ -15,6 +15,8 @@ All memory mapped to the cpu needs to aligned to 0x100 for page crossing checks 
 ## Projects That use this CPU core
 
 * https://github.com/FluBBaOfWard/C64DS
+* https://github.com/FluBBaOfWard/LodjurDS
+* https://github.com/FluBBaOfWard/LodjurGBA
 * https://github.com/FluBBaOfWard/N2A03
 * https://github.com/FluBBaOfWard/NesDS
 * https://github.com/FluBBaOfWard/PunchOutDS
