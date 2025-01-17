@@ -9,7 +9,7 @@ You can also define NO_FASTMEM_6502 to not use itcm (on NDS) or iwram (on GBA) f
 
 First you need to allocate space for the cpu core state, either by using the struct from C or allocating/reserving memory using the "m6502Size"
 Next call m6502Init with a pointer to that memory.
-All memory mapped to the cpu needs to aligned to 0x100 for page crossing checks for extra cycles.
+On 65C02 all memory mapped to the cpu needs to aligned to 0x100 for page crossing checks for extra cycles.
 
 
 ## Projects That use this CPU core

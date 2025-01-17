@@ -19,6 +19,14 @@
 
 ;@----------------------------------------------------------------------------
 
+	.macro m6502BailOut			;@ This can be used to exit emulation early.
+	orr cycles,cycles,#0xF0000000
+	.endm
+
+	.macro m6502FixCycles		;@ Used to fix Cycles after early BailOut.
+	mov cycles,cycles,lsl#4
+	mov cycles,cycles,asr#4
+	.endm
 
 	.macro loadLastBank reg
 	ldr \reg,[m6502ptr,#m6502LastBank]
