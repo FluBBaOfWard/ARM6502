@@ -6,7 +6,6 @@ ARM6502 To do
 	* Decimal calculation.
 	* Page wrap handling.
 	* More?
-	define __65C02__ if either of W65C02 or W65C02_OLD is defined
 	Verify decimal mode.
 	Optimize decimal mode.
 	Optimize set NMI pin.

@@ -1,5 +1,12 @@
 
 #include "M6502.i"
+
+#if defined(W65C02)
+	#define R65C02
+#endif
+#if defined(R65C02)
+	#define M65C02
+#endif
 							;@ ARM flags
 	.equ PSR_N, 0x80000000		;@ Negative (Sign)
 	.equ PSR_Z, 0x40000000		;@ Zero
@@ -263,7 +270,7 @@
 	.macro readWriteMem				;@ !! Crazy Maniacs use this feature !!
 	.ifeq AddressMode-_ABS
 		readMem8
-#if defined(W65C02) || defined(W65C02_OLD)
+#if defined(M65C02)
 		readMem8
 #else
 		writeMem8
@@ -414,7 +421,7 @@
 	ldrb addy,[m6502pc],#1
 	.endm
 
-#if defined(W65C02)
+#if defined(R65C02)
 	.macro doZ2				;@ Zero page			$nn
 	.set AddressMode, _ZP
 	ldrb addy,[m6502pc],#2	;@ Ugly thing for BBR/BBS
@@ -543,7 +550,7 @@
 	fetch \cyc
 	.endm
 
-#if defined(W65C02)
+#if defined(R65C02)
 	.macro opBBR bit
 	doZ2
 	readMemZP
@@ -587,7 +594,8 @@
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
 	fetch 6
 	.endm
-
+#endif
+#if defined(M65C02)
 	.macro opBITimm
 	and r0,r0,m6502a,lsr#24			;@ Z
 	and m6502nz,m6502nz,0x80000000	;@ Kepp old N
@@ -1074,6 +1082,7 @@
 	fetch \cyc
 	.endm
 
+#if defined(M65C02)
 	.macro opTRB cyc
 	readMem
 	and r1,r0,m6502a,lsr#24			;@ Flags
@@ -1093,5 +1102,6 @@
 	writeMem
 	fetch \cyc
 	.endm
+#endif
 
 ;@----------------------------------------------------------------------------
