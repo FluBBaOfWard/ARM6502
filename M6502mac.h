@@ -458,9 +458,8 @@
 
 	.macro opKIL					;@ Lock cpu
 	mov r11,r11
-	sub m6502pc,m6502pc,#1
 	clearCycles
-	fetch 1
+	b m6502OutOfCycles
 	.endm
 
 	.macro opADC cyc
