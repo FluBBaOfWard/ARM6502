@@ -126,6 +126,11 @@
 	.endm
 
 	.macro clearCycles
+	mvns r0,cycles,asr#CYC_SHIFT			;@
+	addmi cycles,cycles,r0,lsl#CYC_SHIFT	;@ Consume all remaining cycles plus 1.
+	.endm
+
+	.macro zeroCycles
 	and cycles,cycles,#CYC_MASK	;@ Save CPU bits
 	.endm
 
@@ -458,8 +463,7 @@
 
 	.macro opKIL					;@ Lock cpu
 	mov r11,r11
-	clearCycles
-	b m6502OutOfCycles
+	b m6502StpWai
 	.endm
 
 	.macro opADC cyc

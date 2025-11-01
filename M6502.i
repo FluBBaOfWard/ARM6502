@@ -22,7 +22,7 @@
 ;@----------------------------------------------------------------------------
 ;@ cycle flags- (stored in cycles reg for speed)
 	.equ CYC_C, 0x01			;@ Carry bit
-	.equ CYC_I, 0x04			;@ IRQ disable bit
+	.equ CYC_I, 0x04			;@ IRQ mask
 	.equ CYC_D, 0x08			;@ Decimal bit
 	.equ CYC_V, 0x40			;@ Overflow bit
 ;@----------------------------------------------------------------------------

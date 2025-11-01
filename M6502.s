@@ -681,7 +681,7 @@ _57:	;@ SRE $nn,X
 	opSRE 6
 #endif
 ;@----------------------------------------------------------------------------
-_58:	;@ CLI	Clear Interrupt disable
+_58:	;@ CLI
 ;@----------------------------------------------------------------------------
 	eatCycles 2
 	tst cycles,#CYC_I
@@ -916,7 +916,7 @@ _77:	;@ RRA $nn,X
 	opRRA 6
 #endif
 ;@----------------------------------------------------------------------------
-_78:	;@ SEI	Set Interrupt disable
+_78:	;@ SEI
 ;@----------------------------------------------------------------------------
 	getNextOpcode
 	orr cycles,cycles,#CYC_I
@@ -1488,11 +1488,11 @@ _CA:	;@ DEX
 ;@----------------------------------------------------------------------------
 _CB:	;@ WAI
 ;@----------------------------------------------------------------------------
+	eatCycles 3
 	ldrb r0,[m6502ptr,#m6502IrqPending]
 	tst r0,#RESET_F|NMI_F|IRQ_F
 	bne m6502CheckIrqs
-	clearCycles
-	b m6502OutOfCycles
+	b m6502StpWai
 #elif !defined(M65C02)
 ;@----------------------------------------------------------------------------
 _CB:	;@ SBX #$nn
@@ -1600,11 +1600,11 @@ _DA:	;@ PHX
 ;@----------------------------------------------------------------------------
 _DB:	;@ STP
 ;@----------------------------------------------------------------------------
+	eatCycles 3
 	ldrb r0,[m6502ptr,#m6502IrqPending]
 	tst r0,#RESET_F
 	bne m6502CheckIrqs
-	clearCycles
-	b m6502OutOfCycles
+	b m6502StpWai
 #elif !defined(M65C02)
 ;@----------------------------------------------------------------------------
 _DB:	;@ DCP $nnnn,Y
@@ -1996,6 +1996,8 @@ m6502DelayIrqCheck:				;@ Irq should be delayed by 1 instruction.
 	orr cycles,cycles,#0xC0000000
 	executeNext
 ;@----------------------------------------------------------------------------
+m6502StpWai:
+	clearCycles
 m6502OutOfCycles:
 	sub m6502pc,m6502pc,#1
 	mov cycles,cycles,lsl#2		;@ Check for delayed irq check.

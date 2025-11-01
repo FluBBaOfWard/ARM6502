@@ -1,4 +1,4 @@
-# ARM6502 V0.3.7
+# ARM6502 V0.3.8
 
 A 6502 cpu emulator for ARM32.
 
