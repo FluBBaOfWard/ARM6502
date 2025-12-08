@@ -966,7 +966,7 @@
 	ldrb r1,[m6502pc],#1
 	adds addy,m6502y,addy,lsl#24
 
-	adc r0,r1,#0x01
+	add r0,r1,#0x01
 	and r0,r0,m6502x,lsr#24
 	and r0,r0,m6502a,lsr#24
 
@@ -983,7 +983,7 @@
 	ldrb r1,[r0,#1]
 	adds addy,m6502y,addy,lsl#24
 
-	adc r0,r1,#0x01
+	add r0,r1,#0x01
 	and r0,r0,m6502x,lsr#24
 	and r0,r0,m6502a,lsr#24
 
@@ -999,17 +999,16 @@
 	ldrb r1,[m6502pc],#1
 	adds addy,m6502y,addy,lsl#24
 
-	adc r0,r1,#0x01
-	and r0,r0,m6502x,lsr#24
-	and r0,r0,m6502a,lsr#24
+	add r0,r1,#0x01
+	and m6502sp,m6502x,m6502a
+	and r0,r0,m6502sp,lsr#24
 
 	orrcc addy,addy,r1
 	orrcs addy,addy,r0
 	mov addy,addy,ror#24
 	writeMem
 
-	and m6502sp,m6502x,m6502a
-	orr m6502sp,m6502sp,#1
+	orr m6502sp,m6502sp,#1			;@ Set back Stack page.
 	fetch \cyc
 	.endm
 
@@ -1018,7 +1017,7 @@
 	ldrb r1,[m6502pc],#1
 	adds addy,m6502y,addy,lsl#24
 
-	adc r0,r1,#0x01
+	add r0,r1,#0x01
 	and r0,r0,m6502x,lsr#24
 
 	orrcc addy,addy,r1
@@ -1033,7 +1032,7 @@
 	ldrb r1,[m6502pc],#1
 	adds addy,m6502x,addy,lsl#24
 
-	adc r0,r1,#0x01
+	add r0,r1,#0x01
 	and r0,r0,m6502y,lsr#24
 
 	orrcc addy,addy,r1
