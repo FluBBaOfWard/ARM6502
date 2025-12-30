@@ -1915,7 +1915,7 @@ m6502SetIRQPin:
 	strb r0,[m6502ptr,#m6502IrqPending]
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502DelayIrqCheck:				;@ Irq should be delayed by 1 instruction.
+m6502DelayIrqCheck:				;@ Irq can be delayed by 1 instruction.
 ;@----------------------------------------------------------------------------
 	orr cycles,cycles,#0xC0000000
 	executeNext
@@ -2160,6 +2160,10 @@ _E3:
 _EB:
 _F3:
 _FB:
+#if !defined(W65C02)
+_CB:
+_DB:
+#endif
 #if !defined(R65C02)
 _07:
 _0F:
@@ -2194,15 +2198,12 @@ _EF:
 _F7:
 _FF:
 #endif
-#if !defined(W65C02)
-_CB:
-_DB:
-#endif
 	mov r11,r11					;@ No$GBA debugg!
 /*
  	Do some debugging!
  */
-	fetch 1
+	eatCycles 1
+	executeNext					;@ These NOPs doesnt check IRQ
 #endif
 ;@----------------------------------------------------------------------------
 m6502RunXCyclesC:	;@ r0 = number of cycles to run, r1 = m6502ptr

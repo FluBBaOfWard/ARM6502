@@ -2,10 +2,11 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
-V0.3.8 - 2025-12-08 (FluBBa)
-	Fixed consumed cycles for WAI & STP opcodes.
-	Fixed undocumented NOPs.
+V0.3.8 - 2025-12-30 (FluBBa)
 	Fixed SHA, SHS, SHX & SHY a bit.
+	Fixed undocumented NOPs.
+	Fixed decimal ADC on 65C02.
+	Fixed consumed cycles for WAI & STP opcodes.
 
 V0.3.7 - 2025-01-26 (FluBBa)
 	Minor adjustments for better PC handling.

@@ -482,6 +482,29 @@
 	.endm
 
 #ifndef CPU_RP2A03
+#if defined(M65C02)
+	.macro opADCD cyc
+	movs r1,cycles,lsr#1        	;@ Get C
+
+	mov r1,r0,lsl#28
+	subcs r1,r1,#0xF0000001
+	adcs m6502a,r1,m6502a,ror#28
+	cmncc m6502a,#0x60000000
+	addcs m6502a,m6502a,#0x60000000
+
+	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
+
+	mov r0,r0,lsr#4
+	subcs r0,r0,#0x00000010
+	mov m6502a,m6502a,ror#4
+	adcs m6502a,m6502a,r0,ror#4
+	bicvc cycles,cycles,#CYC_V		;@ V is set after high addition, before fixup
+	cmncc m6502a,#0x60000000
+	addcs m6502a,m6502a,#0x60000000
+	mov m6502nz,m6502a,asr#24		;@ N & V is after fixup
+	fetch_c \cyc
+	.endm
+#else
 	.macro opADCD cyc
 	movs r1,cycles,lsr#1        	;@ Get C
 	adc m6502nz,r0,m6502a,lsr#24	;@ Z is set with normal addition
@@ -504,6 +527,7 @@
 	addcs m6502a,m6502a,#0x60000000
 	fetch_c \cyc
 	.endm
+#endif
 #endif
 
 	.macro opAND cyc
