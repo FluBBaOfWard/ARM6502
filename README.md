@@ -14,16 +14,16 @@ On 65C02 all memory mapped to the cpu needs to aligned to 0x100 for page crossin
 
 ## Projects That use this CPU core
 
-* https://github.com/FluBBaOfWard/C64DS
-* https://github.com/FluBBaOfWard/LodjurDS
-* https://github.com/FluBBaOfWard/LodjurGBA
-* https://github.com/FluBBaOfWard/N2A03
-* https://github.com/FluBBaOfWard/NesDS
-* https://github.com/FluBBaOfWard/PunchOutDS
-* https://github.com/FluBBaOfWard/RenegadeDS
-* https://github.com/FluBBaOfWard/RenegadeGBA
-* https://github.com/FluBBaOfWard/WasabiDS
-* https://github.com/FluBBaOfWard/WasabiGBA
+* <https://github.com/FluBBaOfWard/C64DS>
+* <https://github.com/FluBBaOfWard/LodjurDS>
+* <https://github.com/FluBBaOfWard/LodjurGBA>
+* <https://github.com/FluBBaOfWard/N2A03>
+* <https://github.com/DS-Homebrew/NesDS> (N2A03)
+* <https://github.com/FluBBaOfWard/PunchOutDS> (N2A03)
+* <https://github.com/FluBBaOfWard/RenegadeDS>
+* <https://github.com/FluBBaOfWard/RenegadeGBA>
+* <https://github.com/FluBBaOfWard/WasabiDS>
+* <https://github.com/FluBBaOfWard/WasabiGBA>
 
 ## Credits
 
