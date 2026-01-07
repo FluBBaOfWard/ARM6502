@@ -26,12 +26,12 @@
 	.arm
 
 #if defined(NDS) && !defined(NO_FASTMEM_6502)
-	.section .itcm						;@ For the NDS ARM9
+	.section .itcm, "ax", %progbits		;@ For the NDS ARM9
 #elif defined(GBA)
 	#if !defined(NO_FASTMEM_6502)
 	.section .iwram, "ax", %progbits	;@ For the GBA
 	#else
-	.section .ewram, "ax"				;@ For the GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
 	#endif
 #else
 	.section .text
@@ -2024,9 +2024,9 @@ opSBC_Dec:
 
 ;@----------------------------------------------------------------------------
 #ifdef GBA
-	.section .ewram, "ax"		;@ For the GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
 #else
-	.section .text				;@ For everything else
+	.section .text						;@ For everything else
 #endif
 
 #if !defined(M65C02)
