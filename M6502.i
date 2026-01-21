@@ -1,4 +1,7 @@
-
+//
+//  M6502.i
+//  ARMM6502
+//
 #if !__ASSEMBLER__
 	#error This header file is only for use in assembly files!
 #endif
@@ -15,6 +18,28 @@
 	m6502zpage	.req r11		;@ ZeroPage RAM ptr
 	addy		.req r12		;@ Keep this at r12 (scratch for APCS)
 
+;@----------------------------------------------------------------------------
+;@ ARM flags
+	.equ PSR_N, 0x80000000		;@ Negative (Sign)
+	.equ PSR_Z, 0x40000000		;@ Zero
+	.equ PSR_C, 0x20000000		;@ Carry
+	.equ PSR_V, 0x10000000		;@ Overflow
+
+
+;@ M6502 flags
+	.equ N, 0x80				;@ Sign (negative)
+	.equ V, 0x40				;@ Overflow
+	.equ R, 0x20				;@ Reserved? allways 1
+	.equ B, 0x10				;@ Interrupt by BRK opcode?
+	.equ D, 0x08				;@ Decimal mode
+	.equ I, 0x04				;@ Interrup Disable
+	.equ Z, 0x02				;@ Zero
+	.equ C, 0x01				;@ Carry
+
+;@----------------------------------------------------------------------------
+	.equ IRQ_VECTOR, 0xFFFE		;@ IRQ interrupt vector address
+	.equ RES_VECTOR, 0xFFFC		;@ RESET interrupt vector address
+	.equ NMI_VECTOR, 0xFFFA		;@ NMI interrupt vector address
 ;@----------------------------------------------------------------------------
 	.equ CYC_SHIFT, 8
 	.equ CYCLE, 1<<CYC_SHIFT	;@ One cycle

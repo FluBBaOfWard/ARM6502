@@ -1,3 +1,7 @@
+//
+//  M6502.h
+//  ARMM6502
+//
 #ifndef ARM6502_HEADER
 #define ARM6502_HEADER
 

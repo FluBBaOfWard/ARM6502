@@ -1,4 +1,7 @@
-
+//
+//  M6502mac.h
+//  ARMM6502
+//
 #include "M6502.i"
 
 #if defined(W65C02)
@@ -7,23 +10,6 @@
 #if defined(R65C02)
 	#define M65C02
 #endif
-							;@ ARM flags
-	.equ PSR_N, 0x80000000		;@ Negative (Sign)
-	.equ PSR_Z, 0x40000000		;@ Zero
-	.equ PSR_C, 0x20000000		;@ Carry
-	.equ PSR_V, 0x10000000		;@ Overflow
-
-
-							;@ M6502 flags
-	.equ N, 0x80				;@ Sign (negative)
-	.equ V, 0x40				;@ Overflow
-	.equ R, 0x20				;@ Reserved? allways 1
-	.equ B, 0x10				;@ Interrupt by BRK opcode?
-	.equ D, 0x08				;@ Decimal mode
-	.equ I, 0x04				;@ Interrup Disable
-	.equ Z, 0x02				;@ Zero
-	.equ C, 0x01				;@ Carry
-
 ;@----------------------------------------------------------------------------
 
 	.macro m6502BailOut			;@ This can be used to exit emulation early.

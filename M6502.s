@@ -1,3 +1,7 @@
+//
+//  M6502.s
+//  ARMM6502
+//
 #ifdef __arm__
 
 #include "M6502mac.h"
@@ -73,7 +77,7 @@ _01:	;@ ORA ($nn,X)
 	opORA 6
 #if !defined(M65C02)
 ;@----------------------------------------------------------------------------
-_03:	;@ SLO ($nn,X)			;ShiftLeft ORA
+_03:	;@ SLO ($nn,X)			ShiftLeft ORA
 ;@----------------------------------------------------------------------------
 	doIIX
 	opSLO 8
@@ -235,7 +239,7 @@ _1A:	;@ INA
 ;@----------------------------------------------------------------------------
 	add m6502a,m6502a,#0x01000000
 	getNextOpcode
-	mov m6502nz,m6502a,asr#24		;@ NZ
+	mov m6502nz,m6502a,asr#24	;@ NZ
 	executeOpcode 2
 #endif
 #if !defined(M65C02)
@@ -466,7 +470,7 @@ _39:	;@ AND $nnnn,Y
 _3A:	;@ DEA
 ;@----------------------------------------------------------------------------
 	sub m6502a,m6502a,#0x01000000
-	mov m6502nz,m6502a,asr#24		;@ NZ
+	mov m6502nz,m6502a,asr#24	;@ NZ
 	fetch 2
 #endif
 #if !defined(M65C02)
@@ -565,10 +569,10 @@ _49:	;@ EOR #$nn
 ;@----------------------------------------------------------------------------
 _4A:	;@ LSR
 ;@----------------------------------------------------------------------------
-	movs m6502nz,m6502a,lsr#25		;@ Z, N never set.
-	orr cycles,cycles,#CYC_C		;@ Prepare C
+	movs m6502nz,m6502a,lsr#25	;@ Z, N never set.
+	orr cycles,cycles,#CYC_C	;@ Prepare C
 	getNextOpcode
-	mov m6502a,m6502nz,lsl#24		;@ Result without garbage
+	mov m6502a,m6502nz,lsl#24	;@ Result without garbage
 	executeOpcode_c 2
 #if !defined(M65C02)
 ;@----------------------------------------------------------------------------
@@ -576,10 +580,10 @@ _4B:	;@ ALR #$nn
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502pc],#1
 	and m6502a,m6502a,r0,lsl#24
-	movs m6502nz,m6502a,lsr#25		;@ Z, N never set.
-	orr cycles,cycles,#CYC_C		;@ Prepare C
+	movs m6502nz,m6502a,lsr#25	;@ Z, N never set.
+	orr cycles,cycles,#CYC_C	;@ Prepare C
 	getNextOpcode
-	mov m6502a,m6502nz,lsl#24		;@ Result without garbage
+	mov m6502a,m6502nz,lsl#24	;@ Result without garbage
 	executeOpcode_c 2
 #endif
 ;@----------------------------------------------------------------------------
@@ -670,11 +674,9 @@ _58:	;@ CLI
 ;@----------------------------------------------------------------------------
 	eatCycles 2
 	tst cycles,#CYC_I
-//	beq m6502CheckIrqs
 	bic cycles,cycles,#CYC_I
 	bne m6502DelayIrqCheck
 	fetch 0
-	.pool
 ;@----------------------------------------------------------------------------
 _59:	;@ EOR $nnnn,Y
 ;@----------------------------------------------------------------------------
@@ -970,7 +972,7 @@ _80:	;@ BRA branch always
 ;@----------------------------------------------------------------------------
 	ldrsb r0,[m6502pc],#1
 	add m6502pc,m6502pc,r0
-	fetch 3							;@ +1 if pageboundary crossed.
+	fetch 3						;@ +1 if pageboundary crossed.
 #endif
 
 ;@----------------------------------------------------------------------------
@@ -1887,13 +1889,6 @@ translate6502PCToOffset:	;@ In = m6502pc, out = r0 bank offset
 	bx lr						;@ Out: m6502pc.
 
 ;@----------------------------------------------------------------------------
-m6502SetResetPin:			;@ Can only be set
-;@----------------------------------------------------------------------------
-	ldrb r0,[m6502ptr,#m6502IrqPending]
-	orr r0,r0,#RESET_F
-	strb r0,[m6502ptr,#m6502IrqPending]
-	bx lr
-;@----------------------------------------------------------------------------
 m6502SetNMIPin:				;@ NMI is edge triggered
 ;@----------------------------------------------------------------------------
 	cmp r0,#0
@@ -1961,8 +1956,8 @@ takeIRQ:
 #else
 	movs r0,r0,lsl#28
 	ldrpl r12,interruptVectors+8	;@ IRQ
-	ldrmi r12,interruptVectors+12	;@ NMI?
-	ldrcs r12,interruptVectors+16	;@ Reset?
+	ldrmi r12,interruptVectors+12	;@ NMI
+	ldrcs r12,interruptVectors+16	;@ Reset
 #endif // ARM9
 ;@----------------------------------------------------------
 irq6502:					;@ Needs irq vector in r12
@@ -1985,22 +1980,18 @@ irqContinue:
 
 	fetch 7
 ;@----------------------------------------------------------------------------
-doBRK:						;@ Moved here for alignment
+doBRK:
 ;@----------------------------------------------------------------------------
 	mov r11,r11					;@ No$GBA debug!
-	add m6502pc,m6502pc,#2
+	ldr r12,interruptVectors+8	;@ IRQ_VECTOR
 	loadLastBank r0
+	add m6502pc,m6502pc,#2
 	sub r0,m6502pc,r0
 	push16						;@ Save PC
 
 	encodeP (B+R)				;@ Save P
-	ldr r12,interruptVectors+8	;@=IRQ_VECTOR
 	b irqContinue
 
-;@----------------------------------------------------------------------------
-	.equ IRQ_VECTOR, 0xFFFE		;@ IRQ interrupt vector address
-	.equ RES_VECTOR, 0xFFFC		;@ RESET interrupt vector address
-	.equ NMI_VECTOR, 0xFFFA		;@ NMI interrupt vector address
 ;@----------------------------------------------------------------------------
 interruptVectors:
 ;@----------------------------------------------------------------------------
@@ -2206,7 +2197,7 @@ _FF:
 	executeNext					;@ These NOPs doesnt check IRQ
 #endif
 ;@----------------------------------------------------------------------------
-m6502RunXCyclesC:	;@ r0 = number of cycles to run, r1 = m6502ptr
+m6502RunXCyclesC:			;@ r0 = number of cycles to run, r1 = m6502ptr
 	.type m6502RunXCyclesC STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4-r11,lr}
@@ -2219,7 +2210,14 @@ returnToC:
 	ldmfd sp!,{r4-r11,lr}
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502Init:				;@ In r0=m6502ptr.
+m6502SetResetPin:			;@ Can only be set
+;@----------------------------------------------------------------------------
+	ldrb r0,[m6502ptr,#m6502IrqPending]
+	orr r0,r0,#RESET_F
+	strb r0,[m6502ptr,#m6502IrqPending]
+	bx lr
+;@----------------------------------------------------------------------------
+m6502Init:					;@ In r0=m6502ptr.
 	.type m6502Init STT_FUNC
 ;@----------------------------------------------------------------------------
 	add r0,r0,#m6502Opz
@@ -2227,7 +2225,7 @@ m6502Init:				;@ In r0=m6502ptr.
 	mov r2,#256*4
 	b memcpy
 ;@----------------------------------------------------------------------------
-m6502Reset:				;@ In r0=m6502ptr.
+m6502Reset:					;@ In r0=m6502ptr.
 	.type m6502Reset STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4-r11,lr}
@@ -2272,14 +2270,14 @@ m6502SaveState:			;@ In r0=destination, r1=m6502ptr. Out r0=state size.
 	mov r0,#m6502StateSize					;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
+m6502LoadState:				;@ In r0=m6502ptr, r1=source. Out r0=state size.
 	.type   m6502LoadState STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{m6502pc,m6502ptr,m6502zpage,lr}
 
 	mov m6502ptr,r0
 	add r0,m6502ptr,#m6502StateStart
-	mov r2,#m6502StateSize	;@ Right now 0x24
+	mov r2,#m6502StateSize				;@ Right now 0x24
 	bl memcpy
 
 	ldr m6502zpage,[m6502ptr,#m6502MemTbl]
@@ -2290,19 +2288,19 @@ m6502LoadState:			;@ In r0=m6502ptr, r1=source. Out r0=state size.
 
 	ldmfd sp!,{m6502pc,m6502ptr,m6502zpage,lr}
 ;@----------------------------------------------------------------------------
-m6502GetStateSize:		;@ Out r0=state size.
+m6502GetStateSize:			;@ Out r0=state size.
 	.type   m6502GetStateSize STT_FUNC
 ;@----------------------------------------------------------------------------
-	mov r0,#m6502StateSize				;@ Right now 0x24
+	mov r0,#m6502StateSize		;@ Right now 0x24
 	bx lr
 ;@----------------------------------------------------------------------------
-m6502RestoreOpcode:		;@ In r0=m6502ptr, r1=opcode
+m6502RestoreOpcode:			;@ In r0=m6502ptr, r1=opcode
 	.type   m6502RestoreOpcode STT_FUNC
 ;@----------------------------------------------------------------------------
 	adr r3,m6502OpTable
 	ldr r2,[r3,r1,lsl#2]
 ;@----------------------------------------------------------------------------
-m6502PatchOpcode:		;@ In r0=m6502ptr, r1=opcode, r2=function.
+m6502PatchOpcode:			;@ In r0=m6502ptr, r1=opcode, r2=function.
 	.type   m6502PatchOpcode STT_FUNC
 ;@----------------------------------------------------------------------------
 	str r2,[r0,r1,lsl#2]
