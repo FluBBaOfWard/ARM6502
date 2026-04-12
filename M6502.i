@@ -6,7 +6,7 @@
 	#error This header file is only for use in assembly files!
 #endif
 
-				;@ r0,r1,r2=temp regs
+							;@ r0,r1,r2=temp regs
 	m6502nz		.req r3			;@ Bit 31=N, Z=1 if bits 0-7=0
 	m6502a		.req r4			;@ Bits  0-23=0
 	m6502x		.req r5			;@ Bits  0-23=0
@@ -19,14 +19,14 @@
 	addy		.req r12		;@ Keep this at r12 (scratch for APCS)
 
 ;@----------------------------------------------------------------------------
-;@ ARM flags
+							;@ ARM flags
 	.equ PSR_N, 0x80000000		;@ Negative (Sign)
 	.equ PSR_Z, 0x40000000		;@ Zero
 	.equ PSR_C, 0x20000000		;@ Carry
 	.equ PSR_V, 0x10000000		;@ Overflow
 
 
-;@ M6502 flags
+							;@ M6502 flags
 	.equ N, 0x80				;@ Sign (negative)
 	.equ V, 0x40				;@ Overflow
 	.equ R, 0x20				;@ Reserved? allways 1

@@ -2,6 +2,10 @@
 //  M6502mac.h
 //  ARMM6502
 //
+#if !__ASSEMBLER__
+	#error This header file is only for use in assembly files!
+#endif
+
 #include "M6502.i"
 
 #if defined(W65C02)
