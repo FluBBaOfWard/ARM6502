@@ -1,9 +1,8 @@
 ARM6502 To do
 --------------
 
-	Add define for 65c02 to handle:
+	Add define for 65C02 to handle:
 	* Read/modify write.
-	* Decimal calculation.
 	* Page wrap handling.
 	* More?
 	Verify decimal mode.

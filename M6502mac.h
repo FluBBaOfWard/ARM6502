@@ -461,7 +461,7 @@
 	tst cycles,#CYC_D
 	bne opADC_Dec
 #endif
-	movs r1,cycles,lsr#1			;@ Get C
+	tst cycles,cycles,lsr#1        	;@ Get C
 	subcs r0,r0,#0x00000100
 	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
 	adcs m6502a,m6502a,r0,ror#8
@@ -474,7 +474,7 @@
 #ifndef CPU_RP2A03
 #if defined(M65C02)
 	.macro opADCD cyc
-	movs r1,cycles,lsr#1        	;@ Get C
+	tst cycles,cycles,lsr#1        	;@ Get C
 
 	mov r1,r0,lsl#28
 	subcs r1,r1,#0xF0000001
@@ -491,12 +491,13 @@
 	bicvc cycles,cycles,#CYC_V		;@ V is set after high addition, before fixup
 	cmncc m6502a,#0x60000000
 	addcs m6502a,m6502a,#0x60000000
-	mov m6502nz,m6502a,asr#24		;@ N & V is after fixup
-	fetch_c \cyc
+	getNextOpcode
+	mov m6502nz,m6502a,asr#24		;@ N & Z is after fixup
+	executeOpcode_c \cyc
 	.endm
 #else
 	.macro opADCD cyc
-	movs r1,cycles,lsr#1        	;@ Get C
+	tst cycles,cycles,lsr#1        	;@ Get C
 	adc m6502nz,r0,m6502a,lsr#24	;@ Z is set with normal addition
 
 	mov r1,r0,lsl#28
@@ -518,7 +519,7 @@
 	fetch_c \cyc
 	.endm
 #endif
-#endif
+#endif // !CPU_RP2A03
 
 	.macro opAND cyc
 	and m6502a,m6502a,r0,lsl#24
@@ -611,7 +612,7 @@
 	andeq cycles,cycles,#CYC_MASK	;@ Save CPU bits
 	fetch 6
 	.endm
-#endif
+#endif // defined(R65C02)
 #if defined(M65C02)
 	.macro opBITimm
 	and r0,r0,m6502a,lsr#24			;@ Z
@@ -620,7 +621,7 @@
 	getNextOpcode
 	executeOpcode 2
 	.endm
-#endif
+#endif // defined(M65C02)
 
 	.macro opBIT cyc
 	bic cycles,cycles,#CYC_V		;@ Clear V
@@ -945,6 +946,26 @@
 	.endm
 
 #ifndef CPU_RP2A03
+#if defined(M65C02)
+	.macro opSBCD cyc
+	tst cycles,cycles,lsr#1			;@ Get C
+	mov r2,#0
+	mov r1,m6502a,lsl#4
+	sbcs r1,r1,r0,lsl#28
+	movcc r2,#0x06000000
+	tst cycles,cycles,lsr#1			;@ Get C
+	sbcs m6502a,m6502a,r0,lsl#24
+	orrcc r2,r2,#0x60000000
+	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
+	bicvc cycles,cycles,#CYC_V		;@ V
+	sub m6502a,m6502a,r2
+	and m6502a,m6502a,#0xff000000
+
+	getNextOpcode
+	mov m6502nz,m6502a,asr#24 		;@ NZ
+	executeOpcode_c \cyc
+	.endm
+#else
 	.macro opSBCD cyc
 	movs r1,cycles,lsr#1			;@ Get C
 	subcc r0,r0,#0x00000100
@@ -964,6 +985,7 @@
 	executeOpcode \cyc
 	.endm
 #endif
+#endif // !CPU_RP2A03
 
 	.macro opSBX cyc
 	readMem

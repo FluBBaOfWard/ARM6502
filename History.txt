@@ -2,6 +2,9 @@ ARM6502 revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-
 
 
+V0.3.9 - 2026-10-30 (FluBBa)
+	Fixed SBC decimal mode for 65C02.
+
 V0.3.8 - 2026-04-12 (FluBBa)
 	Fixed SHA, SHS, SHX & SHY a bit.
 	Fixed undocumented NOPs.
