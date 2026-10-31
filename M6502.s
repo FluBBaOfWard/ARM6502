@@ -591,14 +591,9 @@ _4C:	;@ JMP $nnnn
 ;@----------------------------------------------------------------------------
 	ldrb r0,[m6502pc]
 	ldrb m6502pc,[m6502pc,#1]
-	add r2,m6502ptr,#m6502MemTbl
-	and r1,m6502pc,#0xE0
-	ldr r1,[r2,r1,lsr#3]		;@ In: m6502pc.
 	orr m6502pc,r0,m6502pc,lsl#8
-	add m6502pc,m6502pc,r1
-	getNextOpcode
-	storeLastBank r1
-	executeOpcode 3
+	encodePC
+	fetch 3
 ;@----------------------------------------------------------------------------
 _4D:	;@ EOR $nnnn
 ;@----------------------------------------------------------------------------
@@ -933,11 +928,7 @@ _7B:	;@ RRA $nnnn,Y
 ;@----------------------------------------------------------------------------
 _7C:	;@ JMP ($nnnn,X)
 ;@----------------------------------------------------------------------------
-	doAIX
-	add r1,m6502ptr,m6502MemTbl
-	and r2,addy,#0xE000
-	ldr r1,[r1,r2,lsr#11]
-	ldrb r0,[r1,addy]!
+	readMemAIX
 	ldrb m6502pc,[r1,#1]
 	orr m6502pc,r0,m6502pc,lsl#8
 	encodePC
@@ -1881,9 +1872,17 @@ reTranslate6502PCToOffset:		;@ In = m6502pc+bank, out = r0 bank offset
 ;@----------------------------------------------------------------------------
 translate6502PCToOffset:	;@ In = m6502pc, out = r0 bank offset
 ;@----------------------------------------------------------------------------
-	add r1,m6502ptr,#m6502MemTbl
-	and r0,m6502pc,#0xE000
-	ldr r0,[r1,r0,lsr#11]
+//	add r1,m6502ptr,#m6502MemTbl
+//	and r0,m6502pc,#0xE000
+//	ldr r0,[r1,r0,lsr#11]
+	stmfd sp!,{lr}
+	mov addy,m6502pc
+	add r0,m6502ptr,#m6502ReadTbl
+	and r1,addy,#0xE000
+	mov lr,pc
+	ldr pc,[r0,r1,lsr#11]		;@ In: addy,r0=val(bits 8-31=?)
+	ldmfd sp!,{lr}
+	sub r0,r1,addy
 	storeLastBank r0
 	add m6502pc,m6502pc,r0
 	bx lr						;@ Out: m6502pc.
@@ -1974,8 +1973,12 @@ irqContinue:
 #if defined(M65C02)
 	bic cycles,cycles,#CYC_D	;@ and decimal mode?
 #endif
-	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
-	ldrh m6502pc,[r0,r12]
+//	ldr r0,[m6502ptr,#m6502MemTbl+7*4]
+//	ldrh m6502pc,[r0,r12]
+	mov lr,pc
+	ldr pc,[m6502ptr,#m6502ReadTbl+7*4]
+	ldrb m6502pc,[r1,#1]		;@ Next byte
+	orr m6502pc,r0,m6502pc,lsl#8
 	encodePC					;@ Get IRQ vector
 
 	fetch 7
