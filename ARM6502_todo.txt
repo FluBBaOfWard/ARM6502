@@ -5,7 +5,6 @@ ARM6502 To do
 	* Read/modify write.
 	* Page wrap handling.
 	* More?
-	Verify decimal mode.
 	Optimize decimal mode.
 	Optimize NMI/IRQ check.
 	Make core completly objectified?

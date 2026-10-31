@@ -616,7 +616,7 @@
 #if defined(M65C02)
 	.macro opBITimm
 	and r0,r0,m6502a,lsr#24			;@ Z
-	and m6502nz,m6502nz,0x80000000	;@ Kepp old N
+	and m6502nz,m6502nz,0x80000000	;@ Keep old N
 	orr m6502nz,m6502nz,r0			;@ Z
 	getNextOpcode
 	executeOpcode 2
@@ -914,7 +914,7 @@
 	tst cycles,#CYC_D
 	bne opADC_Dec
 #endif
-	movs r1,cycles,lsr#1			;@ Get C
+	tst cycles,cycles,lsr#1			;@ Get C
 	subcs r0,r0,#0x00000100
 	adcs m6502a,m6502a,r0,ror#8
 	mov m6502nz,m6502a,asr#24		;@ NZ
@@ -935,7 +935,7 @@
 	tst cycles,#CYC_D
 	bne opSBC_Dec
 #endif
-	movs r1,cycles,lsr#1			;@ Get C
+	tst cycles,cycles,lsr#1			;@ Get C
 	sbcs m6502a,m6502a,r0,lsl#24
 	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
 	and m6502a,m6502a,#0xff000000
@@ -949,17 +949,15 @@
 #if defined(M65C02)
 	.macro opSBCD cyc
 	tst cycles,cycles,lsr#1			;@ Get C
-	mov r2,#0
-	mov r1,m6502a,lsl#4
-	sbcs r1,r1,r0,lsl#28
-	movcc r2,#0x06000000
-	tst cycles,cycles,lsr#1			;@ Get C
-	sbcs m6502a,m6502a,r0,lsl#24
-	orrcc r2,r2,#0x60000000
+	subcc r0,r0,#0x00000100
+	eor r1,r0,m6502a,lsr#24
+	sbcs m6502a,m6502a,r0,ror#8
+	eor r1,r1,m6502a,lsr#24
+	subcc m6502a,m6502a,#0x60000000
 	orr cycles,cycles,#CYC_C+CYC_V	;@ Prepare C & V
 	bicvc cycles,cycles,#CYC_V		;@ V
-	sub m6502a,m6502a,r2
-	and m6502a,m6502a,#0xff000000
+	tst r1,#0x10					;@ This should not change C
+	subne m6502a,m6502a,#0x06000000
 
 	getNextOpcode
 	mov m6502nz,m6502a,asr#24 		;@ NZ
@@ -967,7 +965,7 @@
 	.endm
 #else
 	.macro opSBCD cyc
-	movs r1,cycles,lsr#1			;@ Get C
+	tst cycles,cycles,lsr#1			;@ Get C
 	subcc r0,r0,#0x00000100
 	sbcs m6502a,m6502a,r0,ror#8
 	mov m6502nz,m6502a,asr#24 		;@ NZ
@@ -1140,6 +1138,6 @@
 	writeMem
 	fetch \cyc
 	.endm
-#endif
+#endif // defined(M65C02)
 
 ;@----------------------------------------------------------------------------
